@@ -7,13 +7,23 @@ use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeAgreement;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\BuyerTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ExchangedDocument;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PostalTradeAddress;
+use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SupplyChainTradeTransaction;
+use Tiime\CrossIndustryInvoice\DataType\BuyerGlobalIdentifier;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\BuyerSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\ExchangedDocumentContext;
 use Tiime\CrossIndustryInvoice\DataType\GuidelineSpecifiedDocumentContextParameter;
 use Tiime\CrossIndustryInvoice\DataType\IssueDateTime;
+use Tiime\CrossIndustryInvoice\DataType\SpecifiedTaxRegistrationVA;
+use Tiime\CrossIndustryInvoice\DataType\URIUniversalCommunication;
 use Tiime\EN16931\Codelist\InvoiceTypeCodeUNTDID1001;
+use Tiime\EN16931\DataType\Identifier\BuyerIdentifier;
+use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
+use Tiime\EN16931\DataType\Identifier\SellerIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
+use Tiime\EN16931\DataType\Identifier\VatIdentifier;
+use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\SellerPartyIdentification;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\UniversalBusinessLanguage;
 
 class UBLToCIIInvoice
@@ -64,30 +74,105 @@ class UBLToCIIInvoice
 
     private static function getBuyerTradeParty(UniversalBusinessLanguage $invoice): BuyerTradeParty
     {
-        return new BuyerTradeParty(
-            name: $invoice->getAccountingCustomerParty()->getParty()->getPartyName()->getName(),
-            postalTradeAddress: (new PostalTradeAddress(countryID: $invoice->getAccountingCustomerParty()->getParty()->getPostalAddress()->getCountry()->getIdentificationCode()))
-                ->setLineOne($invoice->getAccountingCustomerParty()->getParty()->getPostalAddress()->getStreetName()) // BT-50
-                ->setLineTwo($invoice->getAccountingCustomerParty()->getParty()->getPostalAddress()->getAdditionalStreetName()) // BT-51
-                ->setLineThree($invoice->getAccountingCustomerParty()->getParty()->getPostalAddress()->getAddressLine()?->getLine()) // BT-163
-                ->setCityName($invoice->getAccountingCustomerParty()->getParty()->getPostalAddress()->getCityName()) // BT-52
-                ->setPostcodeCode($invoice->getAccountingCustomerParty()->getParty()->getPostalAddress()->getPostalZone()) // BT-53
-                ->setCountrySubDivisionName($invoice->getAccountingCustomerParty()->getParty()->getPostalAddress()->getCountrySubentity()) // BT-54
-        );
-        // @todo ajouter les setter du buyerTradeParty
+        $buyerParty = $invoice->getAccountingCustomerParty()->getParty();
+
+        return (new BuyerTradeParty(
+            name: $buyerParty->getPartyName()->getName(),
+            postalTradeAddress: (new PostalTradeAddress(countryID: $buyerParty->getPostalAddress()->getCountry()->getIdentificationCode()))
+                ->setLineOne($buyerParty->getPostalAddress()->getStreetName()) // BT-50
+                ->setLineTwo($buyerParty->getPostalAddress()->getAdditionalStreetName()) // BT-51
+                ->setLineThree($buyerParty->getPostalAddress()->getAddressLine()?->getLine()) // BT-163
+                ->setCityName($buyerParty->getPostalAddress()->getCityName()) // BT-52
+                ->setPostcodeCode($buyerParty->getPostalAddress()->getPostalZone()) // BT-53
+                ->setCountrySubDivisionName($buyerParty->getPostalAddress()->getCountrySubentity()) // BT-54
+        ))
+            ->setIdentifier(
+                new BuyerIdentifier(
+                    $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->value,
+                    $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme
+                )
+            ) // BT-46
+            ->setGlobalIdentifier(
+                new BuyerGlobalIdentifier(
+                    $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->value,
+                    $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme
+                )
+            ) // BT-46-0 & BT-46-1
+            ->setURIUniversalCommunication(
+                new URIUniversalCommunication(
+                    new ElectronicAddressIdentifier(
+                        $buyerParty->getEndpointIdentifier()?->value,
+                        $buyerParty->getEndpointIdentifier()?->scheme
+                    )
+                )
+            ) // BT-49
+            ->setSpecifiedTaxRegistrationVA(
+                new SpecifiedTaxRegistrationVA(
+                    new VatIdentifier($buyerParty->getPartyTaxScheme()->getTaxScheme()->getIdentifier())
+                )
+            ) // BT-48
+            ->setSpecifiedLegalOrganization(
+                (new BuyerSpecifiedLegalOrganization())
+                    ->setIdentifier($buyerParty->getPartyLegalEntity()->getIdentifier())
+                    ->setTradingBusinessName($buyerParty->getPartyLegalEntity()->getRegistrationName())
+            ) // BT-47
+        ;
     }
 
     private static function getSellerTradeParty(UniversalBusinessLanguage $invoice): SellerTradeParty
     {
-        return new SellerTradeParty(
-            name: $invoice->getAccountingSupplierParty()->getParty()->getPartyName()->getName(),
-            postalTradeAddress: (new PostalTradeAddress(countryID: $invoice->getAccountingSupplierParty()->getParty()->getPostalAddress()->getCountry()->getIdentificationCode()))
-                ->setLineOne($invoice->getAccountingSupplierParty()->getParty()->getPostalAddress()->getStreetName()) // BT-35
-                ->setLineTwo($invoice->getAccountingSupplierParty()->getParty()->getPostalAddress()->getAdditionalStreetName()) // BT-36
-                ->setLineThree($invoice->getAccountingSupplierParty()->getParty()->getPostalAddress()->getAddressLine()?->getLine()) // BT-162
-                ->setCityName($invoice->getAccountingSupplierParty()->getParty()->getPostalAddress()->getCityName()) // BT-37
-                ->setPostcodeCode($invoice->getAccountingSupplierParty()->getParty()->getPostalAddress()->getPostalZone()) // BT-38
-                ->setCountrySubDivisionName($invoice->getAccountingSupplierParty()->getParty()->getPostalAddress()->getCountrySubentity()) // BT-39
-        );
+        $sellerParty = $invoice->getAccountingSupplierParty()->getParty();
+
+        return (new SellerTradeParty(
+            name: $sellerParty->getPartyName()->getName(),
+            postalTradeAddress: (new PostalTradeAddress(countryID: $sellerParty->getPostalAddress()->getCountry()->getIdentificationCode()))
+                ->setLineOne($sellerParty->getPostalAddress()->getStreetName()) // BT-35
+                ->setLineTwo($sellerParty->getPostalAddress()->getAdditionalStreetName()) // BT-36
+                ->setLineThree($sellerParty->getPostalAddress()->getAddressLine()?->getLine()) // BT-162
+                ->setCityName($sellerParty->getPostalAddress()->getCityName()) // BT-37
+                ->setPostcodeCode($sellerParty->getPostalAddress()->getPostalZone()) // BT-38
+                ->setCountrySubDivisionName($sellerParty->getPostalAddress()->getCountrySubentity()) // BT-39
+        ))
+            ->setIdentifiers(
+                array_map(
+                    static fn (SellerPartyIdentification $partyIdentification) => new SellerIdentifier(
+                        $partyIdentification->getSellerIdentifier()->value,
+                        $partyIdentification->getSellerIdentifier()->scheme
+                    ),
+                    $sellerParty->getPartyIdentifications()
+                )
+            ) // BT-90 + BT-29
+            ->setGlobalIdentifiers(
+                array_map(
+                    static fn (SellerPartyIdentification $partyIdentification) => new SellerIdentifier(
+                        $partyIdentification->getSellerIdentifier()->value,
+                        $partyIdentification->getSellerIdentifier()->scheme
+                    ),
+                    $sellerParty->getPartyIdentifications()
+                )
+            )
+            ->setURIUniversalCommunication(
+                new URIUniversalCommunication(
+                    new ElectronicAddressIdentifier(
+                        $sellerParty->getEndpointIdentifier()?->value,
+                        $sellerParty->getEndpointIdentifier()?->scheme
+                    )
+                )
+            ) // BT-34
+            ->setSpecifiedTaxRegistrationVA(
+                empty($vatTaxScheme = array_filter(
+                    $sellerParty->getPartyTaxSchemes(),
+                    fn ($scheme) => 'VAT' === $scheme->getTaxScheme()->getIdentifier()
+                )) ? null :
+                new SpecifiedTaxRegistrationVA(
+                    reset($vatTaxScheme)->getCompanyIdentifier()
+                )
+            ) // BT-31
+            ->setSpecifiedLegalOrganization(
+                (new SellerSpecifiedLegalOrganization())
+                    ->setIdentifier($sellerParty->getPartyLegalEntity()->getIdentifier())
+                    ->setTradingBusinessName($sellerParty->getPartyLegalEntity()->getRegistrationName())
+            ) // BT-30
+        ;
     }
 }
