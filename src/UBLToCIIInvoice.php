@@ -15,12 +15,11 @@ use Tiime\CrossIndustryInvoice\DataType\EN16931\BuyerSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\ExchangedDocumentContext;
 use Tiime\CrossIndustryInvoice\DataType\GuidelineSpecifiedDocumentContextParameter;
 use Tiime\CrossIndustryInvoice\DataType\IssueDateTime;
+use Tiime\CrossIndustryInvoice\DataType\SellerGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTaxRegistrationVA;
 use Tiime\CrossIndustryInvoice\DataType\URIUniversalCommunication;
 use Tiime\EN16931\Codelist\InvoiceTypeCodeUNTDID1001;
-use Tiime\EN16931\DataType\Identifier\BuyerIdentifier;
 use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
-use Tiime\EN16931\DataType\Identifier\SellerIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
 use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\SellerPartyIdentification;
@@ -87,16 +86,16 @@ class UBLToCIIInvoice
                 ->setCountrySubDivisionName($buyerParty->getPostalAddress()->getCountrySubentity()) // BT-54
         ))
             ->setIdentifier(
-                new BuyerIdentifier(
-                    $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->value,
-                    $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme
-                )
+                null === $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme ?
+                $buyerParty->getPartyIdentification()?->getBuyerIdentifier()
+                : null
             ) // BT-46
             ->setGlobalIdentifier(
+                $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme ?
                 new BuyerGlobalIdentifier(
                     $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->value,
                     $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme
-                )
+                ) : null
             ) // BT-46-0 & BT-46-1
             ->setURIUniversalCommunication(
                 new URIUniversalCommunication(
@@ -135,19 +134,18 @@ class UBLToCIIInvoice
         ))
             ->setIdentifiers(
                 array_map(
-                    static fn (SellerPartyIdentification $partyIdentification) => new SellerIdentifier(
-                        $partyIdentification->getSellerIdentifier()->value,
-                        $partyIdentification->getSellerIdentifier()->scheme
-                    ),
+                    static fn (SellerPartyIdentification $partyIdentification) => null === $partyIdentification->getSellerIdentifier()->scheme ?
+                    $partyIdentification->getSellerIdentifier()
+                    : null,
                     $sellerParty->getPartyIdentifications()
                 )
             ) // BT-90 + BT-29
             ->setGlobalIdentifiers(
                 array_map(
-                    static fn (SellerPartyIdentification $partyIdentification) => new SellerIdentifier(
+                    static fn (SellerPartyIdentification $partyIdentification) => isset($partyIdentification->getSellerIdentifier()->scheme) ? new SellerGlobalIdentifier(
                         $partyIdentification->getSellerIdentifier()->value,
                         $partyIdentification->getSellerIdentifier()->scheme
-                    ),
+                    ) : null,
                     $sellerParty->getPartyIdentifications()
                 )
             )
