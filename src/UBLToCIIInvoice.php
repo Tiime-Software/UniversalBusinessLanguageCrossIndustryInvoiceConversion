@@ -3,25 +3,40 @@
 namespace Tiime\UniversalBusinessLanguageCrossIndustryInvoiceConversion;
 
 use Tiime\CrossIndustryInvoice\BasicWL\CrossIndustryInvoice as BasicWLCrossIndustryInvoice;
+use Tiime\CrossIndustryInvoice\DataType\ActualDeliverySupplyChainEvent;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeAgreement;
+use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeDelivery;
+use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeSettlement;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\BuyerTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ExchangedDocument;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PostalTradeAddress;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerTradeParty;
+use Tiime\CrossIndustryInvoice\DataType\BasicWL\SpecifiedTradeSettlementHeaderMonetarySummation;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SupplyChainTradeTransaction;
 use Tiime\CrossIndustryInvoice\DataType\BuyerGlobalIdentifier;
+use Tiime\CrossIndustryInvoice\DataType\CategoryTradeTax;
+use Tiime\CrossIndustryInvoice\DataType\DefinedTradeContact;
+use Tiime\CrossIndustryInvoice\DataType\DespatchAdviceReferencedDocument;
+use Tiime\CrossIndustryInvoice\DataType\EmailURIUniversalCommunication;
 use Tiime\CrossIndustryInvoice\DataType\EN16931\BuyerSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\ExchangedDocumentContext;
 use Tiime\CrossIndustryInvoice\DataType\GuidelineSpecifiedDocumentContextParameter;
 use Tiime\CrossIndustryInvoice\DataType\IssueDateTime;
+use Tiime\CrossIndustryInvoice\DataType\OccurrenceDateTime;
 use Tiime\CrossIndustryInvoice\DataType\SellerGlobalIdentifier;
+use Tiime\CrossIndustryInvoice\DataType\SellerTaxRepresentativeTradeParty;
+use Tiime\CrossIndustryInvoice\DataType\ShipToTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTaxRegistrationVA;
+use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradeCharge;
+use Tiime\CrossIndustryInvoice\DataType\TaxTotalAmount;
+use Tiime\CrossIndustryInvoice\DataType\TelephoneUniversalCommunication;
 use Tiime\CrossIndustryInvoice\DataType\URIUniversalCommunication;
 use Tiime\EN16931\Codelist\InvoiceTypeCodeUNTDID1001;
 use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
 use Tiime\EN16931\DataType\Identifier\VatIdentifier;
+use Tiime\EN16931\DataType\Reference\DespatchAdviceReference;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\SellerPartyIdentification;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\UniversalBusinessLanguage;
 
@@ -54,28 +69,49 @@ class UBLToCIIInvoice
         );
     }
 
+    /**
+     * BG-25-00.
+     */
     private static function getSupplyChainTradeTransaction(UniversalBusinessLanguage $invoice): SupplyChainTradeTransaction
     {
         return new SupplyChainTradeTransaction(
-            applicableHeaderTradeAgreement: self::getApplicableHeaderTradeAgreement($invoice),
-            applicableHeaderTradeDelivery: self::getApplicableHeaderTradeDelivery(),
-            applicableHeaderTradeSettlement: self::getApplicableHeaderTradeSettlement()
+            applicableHeaderTradeAgreement: self::getApplicableHeaderTradeAgreement($invoice), // BT-10.
+            applicableHeaderTradeDelivery: self::getApplicableHeaderTradeDelivery($invoice), // BG-13.
+            applicableHeaderTradeSettlement: self::getApplicableHeaderTradeSettlement($invoice) // BG-19.
         );
     }
 
+    /**
+     * BT-10.
+     */
     private static function getApplicableHeaderTradeAgreement(UniversalBusinessLanguage $invoice): ApplicableHeaderTradeAgreement
     {
-        return new ApplicableHeaderTradeAgreement(
-            sellerTradeParty: self::getSellerTradeParty($invoice),
+        return (new ApplicableHeaderTradeAgreement(
+            sellerTradeParty: self::getSellerTradeParty($invoice), // BG-4
             buyerTradeParty: self::getBuyerTradeParty($invoice) // BG-7
-        );
+        ))
+            ->setSellerTaxRepresentativeTradeParty( // BG-11
+                null === $invoice->getTaxRepresentativeParty() ? null :
+                new SellerTaxRepresentativeTradeParty(
+                    $invoice->getTaxRepresentativeParty()?->getPartyName(),
+                    (new PostalTradeAddress($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountry()->getIdentificationCode()))
+                        ->setLineOne($invoice->getTaxRepresentativeParty()->getPostalAddress()->getStreetName())
+                        ->setLineTwo($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAdditionalStreetName())
+                        ->setLineThree($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAddressLine()?->getLine())
+                        ->setCityName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCityName())
+                        ->setPostcodeCode($invoice->getTaxRepresentativeParty()->getPostalAddress()->getPostalZone())
+                        ->setCountrySubDivisionName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountrySubentity()),
+                    new SpecifiedTaxRegistrationVA($invoice->getTaxRepresentativeParty()->getPartyTaxScheme()->getCompanyIdentifier()) // BT-63-00
+                ))
+            ->setContractReferencedDocument(null) // BT-12
+        ;
     }
 
     private static function getBuyerTradeParty(UniversalBusinessLanguage $invoice): BuyerTradeParty
     {
         $buyerParty = $invoice->getAccountingCustomerParty()->getParty();
 
-        return (new BuyerTradeParty(
+        return (new BuyerTradeParty( // BG-7
             name: $buyerParty->getPartyName()->getName(),
             postalTradeAddress: (new PostalTradeAddress(countryID: $buyerParty->getPostalAddress()->getCountry()->getIdentificationCode()))
                 ->setLineOne($buyerParty->getPostalAddress()->getStreetName()) // BT-50
@@ -85,39 +121,51 @@ class UBLToCIIInvoice
                 ->setPostcodeCode($buyerParty->getPostalAddress()->getPostalZone()) // BT-53
                 ->setCountrySubDivisionName($buyerParty->getPostalAddress()->getCountrySubentity()) // BT-54
         ))
-            ->setIdentifier(
+            ->setIdentifier( // BT-46
                 null === $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme ?
                 $buyerParty->getPartyIdentification()?->getBuyerIdentifier()
                 : null
-            ) // BT-46
-            ->setGlobalIdentifier(
+            )
+            ->setGlobalIdentifier( // BT-46-0 & BT-46-1
                 $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme ?
                 new BuyerGlobalIdentifier(
                     $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->value,
                     $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme
                 ) : null
-            ) // BT-46-0 & BT-46-1
-            ->setURIUniversalCommunication(
+            )
+            ->setSpecifiedLegalOrganization( // BT-47
+                (new BuyerSpecifiedLegalOrganization())
+                    ->setIdentifier($buyerParty->getPartyLegalEntity()->getIdentifier())
+                    ->setTradingBusinessName($buyerParty->getPartyLegalEntity()->getRegistrationName())
+            )
+            ->setSpecifiedTaxRegistrationVA( // BT-48
+                new SpecifiedTaxRegistrationVA(
+                    new VatIdentifier($buyerParty->getPartyTaxScheme()->getTaxScheme()->getIdentifier())
+                )
+            )
+            ->setURIUniversalCommunication( // BT-49
                 new URIUniversalCommunication(
                     new ElectronicAddressIdentifier(
                         $buyerParty->getEndpointIdentifier()?->value,
                         $buyerParty->getEndpointIdentifier()?->scheme
                     )
                 )
-            ) // BT-49
-            ->setSpecifiedTaxRegistrationVA(
-                new SpecifiedTaxRegistrationVA(
-                    new VatIdentifier($buyerParty->getPartyTaxScheme()->getTaxScheme()->getIdentifier())
-                )
-            ) // BT-48
-            ->setSpecifiedLegalOrganization(
-                (new BuyerSpecifiedLegalOrganization())
-                    ->setIdentifier($buyerParty->getPartyLegalEntity()->getIdentifier())
-                    ->setTradingBusinessName($buyerParty->getPartyLegalEntity()->getRegistrationName())
-            ) // BT-47
+            )
+            /* TODO: BG-9 quand on implémentera CII EN16931
+            ->setDefinedTradeContact( // BG-9
+                null === $buyerParty->getContact() ? null
+                    : (new DefinedTradeContact())
+                        ->setPersonName($buyerParty->getContact()->getName()) // BT-56
+                        ->setTelephoneUniversalCommunication(new TelephoneUniversalCommunication($buyerParty->getContact()->getTelephone())) // BT-57
+                        ->setEmailURIUniversalCommunication(new EmailURIUniversalCommunication($buyerParty->getContact()->getElectronicMail())) // BT-58
+            )
+            */
         ;
     }
 
+    /**
+     * BG-4.
+     */
     private static function getSellerTradeParty(UniversalBusinessLanguage $invoice): SellerTradeParty
     {
         $sellerParty = $invoice->getAccountingSupplierParty()->getParty();
@@ -132,15 +180,15 @@ class UBLToCIIInvoice
                 ->setPostcodeCode($sellerParty->getPostalAddress()->getPostalZone()) // BT-38
                 ->setCountrySubDivisionName($sellerParty->getPostalAddress()->getCountrySubentity()) // BT-39
         ))
-            ->setIdentifiers(
+            ->setIdentifiers( // BT-90 + BT-29
                 array_map(
                     static fn (SellerPartyIdentification $partyIdentification) => null === $partyIdentification->getSellerIdentifier()->scheme ?
                     $partyIdentification->getSellerIdentifier()
                     : null,
                     $sellerParty->getPartyIdentifications()
                 )
-            ) // BT-90 + BT-29
-            ->setGlobalIdentifiers(
+            )
+            ->setGlobalIdentifiers( // BT-90 + BT-29
                 array_map(
                     static fn (SellerPartyIdentification $partyIdentification) => isset($partyIdentification->getSellerIdentifier()->scheme) ? new SellerGlobalIdentifier(
                         $partyIdentification->getSellerIdentifier()->value,
@@ -149,28 +197,145 @@ class UBLToCIIInvoice
                     $sellerParty->getPartyIdentifications()
                 )
             )
-            ->setURIUniversalCommunication(
+            ->setSpecifiedLegalOrganization( // BT-30
+                specifiedLegalOrganization: (new SellerSpecifiedLegalOrganization())
+                    ->setIdentifier($sellerParty->getPartyLegalEntity()->getIdentifier())
+                    ->setTradingBusinessName($sellerParty->getPartyLegalEntity()->getRegistrationName())
+            )
+            ->setSpecifiedTaxRegistrationVA( // BT-31
+                empty($vatTaxScheme = array_filter(
+                    $sellerParty->getPartyTaxSchemes(),
+                    fn ($scheme) => 'VAT' === $scheme->getTaxScheme()->getIdentifier()
+                )) ? null :
+                    new SpecifiedTaxRegistrationVA(
+                        reset($vatTaxScheme)->getCompanyIdentifier()
+                    )
+            )
+            ->setURIUniversalCommunication( // BT-34
                 new URIUniversalCommunication(
                     new ElectronicAddressIdentifier(
                         $sellerParty->getEndpointIdentifier()?->value,
                         $sellerParty->getEndpointIdentifier()?->scheme
                     )
                 )
-            ) // BT-34
-            ->setSpecifiedTaxRegistrationVA(
-                empty($vatTaxScheme = array_filter(
-                    $sellerParty->getPartyTaxSchemes(),
-                    fn ($scheme) => 'VAT' === $scheme->getTaxScheme()->getIdentifier()
-                )) ? null :
-                new SpecifiedTaxRegistrationVA(
-                    reset($vatTaxScheme)->getCompanyIdentifier()
-                )
-            ) // BT-31
-            ->setSpecifiedLegalOrganization(
-                (new SellerSpecifiedLegalOrganization())
-                    ->setIdentifier($sellerParty->getPartyLegalEntity()->getIdentifier())
-                    ->setTradingBusinessName($sellerParty->getPartyLegalEntity()->getRegistrationName())
-            ) // BT-30
+            )
+            /* TODO: BG-6 quand on implémentera CII EN16931
+            ->setDefinedTradeContact( // BG-6
+                null === $sellerParty->getContact() ? null
+                    : (new DefinedTradeContact())
+                        ->setPersonName($sellerParty->getContact()->getName()) // BT-41
+                        ->setTelephoneUniversalCommunication(new TelephoneUniversalCommunication($sellerParty->getContact()->getTelephone())) // BT-42
+                        ->setEmailURIUniversalCommunication(new EmailURIUniversalCommunication($sellerParty->getContact()->getElectronicMail())) // BT-43
+            )
+            */
         ;
+    }
+
+    /**
+     * BG-13-00.
+     */
+    private static function getApplicableHeaderTradeDelivery(UniversalBusinessLanguage $invoice): ApplicableHeaderTradeDelivery
+    {
+        return (new ApplicableHeaderTradeDelivery())
+            ->setShipToTradeParty(self::getDelivery($invoice)) // BG-13
+            ->setActualDeliverySupplyChainEvent( // BT-72-00
+                null !== $invoice->getDelivery()?->getActualDeliveryDate()?->getDateTimeString() ?
+                new ActualDeliverySupplyChainEvent(new OccurrenceDateTime($invoice->getDelivery()?->getActualDeliveryDate()?->getDateTimeString()))
+                : null
+            )
+            ->setDespatchAdviceReferencedDocument( // BT-16-00
+                null !== $invoice->getDespatchDocumentReference() ?
+                new DespatchAdviceReferencedDocument(new DespatchAdviceReference($invoice->getDespatchDocumentReference()?->getIdentifier()))
+                : null
+            )
+        ;
+    }
+
+    /**
+     * BG-13.
+     */
+    private static function getDelivery(UniversalBusinessLanguage $invoice): ?ShipToTradeParty
+    {
+        $delivery = $invoice->getDelivery();
+
+        if (null === $delivery) {
+            return null;
+        }
+
+        return (new ShipToTradeParty())
+            ->setIdentifier( // BT-71
+                null === $delivery->getDeliveryLocation()?->getIdentifier()->scheme ?
+                $delivery->getDeliveryLocation()?->getIdentifier() : null
+            )
+            ->setGlobalIdentifier( // BT-71-0 & BT-71-1
+                null !== $delivery->getDeliveryLocation()?->getIdentifier()->scheme ?
+                    $delivery->getDeliveryLocation()?->getIdentifier() : null
+            )
+            ->setName($delivery->getDeliveryParty()?->getPartyName()->getName()) // BT-70
+            ->setPostalTradeAddress( // BG-15
+                (new PostalTradeAddress($delivery->getDeliveryLocation()->getAddress()->getCountry()->getIdentificationCode()))
+                    ->setLineOne($delivery->getDeliveryLocation()->getAddress()->getStreetName()) // BT-75
+                    ->setLineTwo($delivery->getDeliveryLocation()->getAddress()->getAdditionalStreetName()) // BT-76
+                    ->setLineThree($delivery->getDeliveryLocation()->getAddress()->getAddressLine()->getLine()) // BT-163
+                    ->setCityName($delivery->getDeliveryLocation()->getAddress()->getCityName()) // BT-77
+                    ->setPostcodeCode($delivery->getDeliveryLocation()->getAddress()->getPostalZone()) // BT-78
+                    ->setCountrySubDivisionName($delivery->getDeliveryLocation()->getAddress()->getCountrySubentity()) // BT-79
+            )
+        ;
+    }
+
+    /**
+     * BG-19.
+     */
+    private static function getApplicableHeaderTradeSettlement(UniversalBusinessLanguage $invoice): ApplicableHeaderTradeSettlement
+    {
+        return new ApplicableHeaderTradeSettlement(
+            invoiceCurrencyCode: $invoice->getTaxCurrencyCode(),
+            specifiedTradeSettlementHeaderMonetarySummation: self::getSpecifiedTradeSettlementHeaderMonetarySummation($invoice), // BG-22
+            applicableTradeTaxes: self::getApplicableTradeTaxes($invoice), // BG-21
+        );
+    }
+
+    /**
+     * BG-22.
+     */
+    private static function getSpecifiedTradeSettlementHeaderMonetarySummation(UniversalBusinessLanguage $invoice): SpecifiedTradeSettlementHeaderMonetarySummation
+    {
+        return (new SpecifiedTradeSettlementHeaderMonetarySummation(
+            taxBasisTotalAmount: $invoice->getLegalMonetaryTotal()->getTaxExclusiveAmount()->getValue()->getValue(), // BT-109
+            grandTotalAmount: $invoice->getLegalMonetaryTotal()->getTaxInclusiveAmount()->getValue()->getValue(), // BT-112
+            duePayableAmount: $invoice->getLegalMonetaryTotal()->getPayableAmount()->getValue()->getValue(), // BT-115
+            lineTotalAmount: $invoice->getLegalMonetaryTotal()->getLineExtensionAmount()->getValue()->getValue(), // BT-106
+        ))
+            ->setChargeTotalAmount($invoice->getLegalMonetaryTotal()->getChargeTotalAmount()?->getValue()->getValue()) // BT-108
+            ->setAllowanceTotalAmount($invoice->getLegalMonetaryTotal()->getAllowanceTotalAmount()?->getValue()->getValue()) // BT-107
+            ->setTaxTotalAmount( // BT-110 & BT-111
+                new TaxTotalAmount(
+                    \is_array($taxTotals = $invoice->getTaxTotals()) ? reset($taxTotals)->getTaxAmount()->getValue()->getValue() : 0,
+                    reset($taxTotals)->getTaxAmount()->getCurrencyCode()
+                )
+            )
+            ->setTotalPrepaidAmount($invoice->getLegalMonetaryTotal()->getPrepaidAmount()?->getValue()->getValue()) // BT-113
+        ;
+    }
+
+    /**
+     * BG-21.
+     *
+     * @return SpecifiedTradeCharge[]
+     */
+    private static function getApplicableTradeTaxes(UniversalBusinessLanguage $invoice): array
+    {
+        return array_map(
+            static fn ($charge) => (new SpecifiedTradeCharge(
+                actualAmount: $charge->getAmount()->getValue()->getValue(), // BT-99
+                categoryTradeTax: new CategoryTradeTax($charge->getTaxCategory()->getVatCategory()), // BT-102-00
+            ))
+                ->setCalculationPercent($charge->getMultiplierFactorNumeric()->getValue()) // BT-101
+                ->setBasisAmount($charge->getBaseAmount()?->getValue()->getValue()) // BT-100
+                ->setReasonCode($charge->getChargeReasonCode()) // BT-105
+                ->setReason($charge->getChargeReason()), // BT-104
+            $invoice->getCharges()
+        );
     }
 }
