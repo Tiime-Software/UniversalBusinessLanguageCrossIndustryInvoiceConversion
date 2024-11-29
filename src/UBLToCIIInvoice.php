@@ -14,12 +14,16 @@ use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerSpecifiedLegalOrganization
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SpecifiedTradeSettlementHeaderMonetarySummation;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SupplyChainTradeTransaction;
+use Tiime\CrossIndustryInvoice\DataType\BillingSpecifiedPeriod;
+use Tiime\CrossIndustryInvoice\DataType\BusinessProcessSpecifiedDocumentContextParameter;
 use Tiime\CrossIndustryInvoice\DataType\BuyerGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\CategoryTradeTax;
 use Tiime\CrossIndustryInvoice\DataType\DefinedTradeContact;
 use Tiime\CrossIndustryInvoice\DataType\DespatchAdviceReferencedDocument;
+use Tiime\CrossIndustryInvoice\DataType\DocumentIncludedNote;
 use Tiime\CrossIndustryInvoice\DataType\EmailURIUniversalCommunication;
 use Tiime\CrossIndustryInvoice\DataType\EN16931\BuyerSpecifiedLegalOrganization;
+use Tiime\CrossIndustryInvoice\DataType\EndDateTime;
 use Tiime\CrossIndustryInvoice\DataType\ExchangedDocumentContext;
 use Tiime\CrossIndustryInvoice\DataType\GuidelineSpecifiedDocumentContextParameter;
 use Tiime\CrossIndustryInvoice\DataType\IssueDateTime;
@@ -29,6 +33,7 @@ use Tiime\CrossIndustryInvoice\DataType\SellerTaxRepresentativeTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\ShipToTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTaxRegistrationVA;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradeCharge;
+use Tiime\CrossIndustryInvoice\DataType\StartDateTime;
 use Tiime\CrossIndustryInvoice\DataType\TaxTotalAmount;
 use Tiime\CrossIndustryInvoice\DataType\TelephoneUniversalCommunication;
 use Tiime\CrossIndustryInvoice\DataType\URIUniversalCommunication;
@@ -45,28 +50,47 @@ class UBLToCIIInvoice
     public static function convert(UniversalBusinessLanguage $invoice): BasicWLCrossIndustryInvoice
     {
         return new BasicWLCrossIndustryInvoice(
-            exchangedDocumentContext: self::getExchangedDocumentContext(), // BG-2
+            exchangedDocumentContext: self::getExchangedDocumentContext($invoice), // BG-2
             exchangedDocument: self::getExchangedDocument($invoice), // BT-1-00
             supplyChainTradeTransaction: self::getSupplyChainTradeTransaction($invoice) // BG-25-00
         );
     }
 
-    private static function getExchangedDocumentContext(): ExchangedDocumentContext
+    /**
+     * BG-2.
+     */
+    private static function getExchangedDocumentContext(UniversalBusinessLanguage $invoice): ExchangedDocumentContext
     {
-        return new ExchangedDocumentContext(
-            guidelineSpecifiedDocumentContextParameter: new GuidelineSpecifiedDocumentContextParameter(
+        return (new ExchangedDocumentContext(
+            guidelineSpecifiedDocumentContextParameter: new GuidelineSpecifiedDocumentContextParameter( // BT-24-00
                 identifier: new SpecificationIdentifier(SpecificationIdentifier::BASICWL)
-            ) // BT-24-00
-        );
+            )
+        ))
+            ->setBusinessProcessSpecifiedDocumentContextParameter( // BT-23-00
+                new BusinessProcessSpecifiedDocumentContextParameter((string) $invoice->getProfileIdentifier())
+            )
+        ;
     }
 
+    /**
+     * BT-1-00.
+     */
     private static function getExchangedDocument(UniversalBusinessLanguage $invoice): ExchangedDocument
     {
-        return new ExchangedDocument(
+        return (new ExchangedDocument(
             identifier: $invoice->getIdentifier(), // BT-1
             typeCode: InvoiceTypeCodeUNTDID1001::from($invoice->getInvoiceTypeCode()->value), // BT-3
             issueDateTime: new IssueDateTime($invoice->getIssueDate()->getDateTimeString()) // BT-2-00
-        );
+        ))
+            ->setIncludedNotes( // BG-1
+                array_map(
+                    static fn ($note) => (new DocumentIncludedNote(
+                        content: $note->getContent() // BT-22
+                    ))->setSubjectCode($note->getSubjectCode()), // BT-21
+                    $invoice->getNotes()
+                )
+            )
+        ;
     }
 
     /**
@@ -93,20 +117,25 @@ class UBLToCIIInvoice
             ->setSellerTaxRepresentativeTradeParty( // BG-11
                 null === $invoice->getTaxRepresentativeParty() ? null :
                 new SellerTaxRepresentativeTradeParty(
-                    $invoice->getTaxRepresentativeParty()?->getPartyName(),
-                    (new PostalTradeAddress($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountry()->getIdentificationCode()))
-                        ->setLineOne($invoice->getTaxRepresentativeParty()->getPostalAddress()->getStreetName())
-                        ->setLineTwo($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAdditionalStreetName())
-                        ->setLineThree($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAddressLine()?->getLine())
-                        ->setCityName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCityName())
-                        ->setPostcodeCode($invoice->getTaxRepresentativeParty()->getPostalAddress()->getPostalZone())
-                        ->setCountrySubDivisionName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountrySubentity()),
+                    $invoice->getTaxRepresentativeParty()?->getPartyName(), // BT-62
+                    (new PostalTradeAddress( // BG-12
+                        $invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountry()->getIdentificationCode()) // BT-69
+                    )
+                        ->setLineOne($invoice->getTaxRepresentativeParty()->getPostalAddress()->getStreetName()) // BT-64
+                        ->setLineTwo($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAdditionalStreetName()) // BT-65
+                        ->setLineThree($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAddressLine()?->getLine()) // BT-164
+                        ->setCityName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCityName()) // BT-66
+                        ->setPostcodeCode($invoice->getTaxRepresentativeParty()->getPostalAddress()->getPostalZone()) // BT-67
+                        ->setCountrySubDivisionName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountrySubentity()), // BT-68
                     new SpecifiedTaxRegistrationVA($invoice->getTaxRepresentativeParty()->getPartyTaxScheme()->getCompanyIdentifier()) // BT-63-00
                 ))
             ->setContractReferencedDocument(null) // BT-12
         ;
     }
 
+    /**
+     * BG-7.
+     */
     private static function getBuyerTradeParty(UniversalBusinessLanguage $invoice): BuyerTradeParty
     {
         $buyerParty = $invoice->getAccountingCustomerParty()->getParty();
@@ -170,7 +199,7 @@ class UBLToCIIInvoice
     {
         $sellerParty = $invoice->getAccountingSupplierParty()->getParty();
 
-        return (new SellerTradeParty(
+        return (new SellerTradeParty( // BG-4
             name: $sellerParty->getPartyName()->getName(),
             postalTradeAddress: (new PostalTradeAddress(countryID: $sellerParty->getPostalAddress()->getCountry()->getIdentificationCode()))
                 ->setLineOne($sellerParty->getPostalAddress()->getStreetName()) // BT-35
@@ -289,11 +318,27 @@ class UBLToCIIInvoice
      */
     private static function getApplicableHeaderTradeSettlement(UniversalBusinessLanguage $invoice): ApplicableHeaderTradeSettlement
     {
-        return new ApplicableHeaderTradeSettlement(
+        return (new ApplicableHeaderTradeSettlement( // BG-19
             invoiceCurrencyCode: $invoice->getTaxCurrencyCode(),
             specifiedTradeSettlementHeaderMonetarySummation: self::getSpecifiedTradeSettlementHeaderMonetarySummation($invoice), // BG-22
             applicableTradeTaxes: self::getApplicableTradeTaxes($invoice), // BG-21
-        );
+        ))
+            ->setBillingSpecifiedPeriod( // BG-14
+                (new BillingSpecifiedPeriod())
+                    ->setStartDateTime(new StartDateTime($invoice->getInvoicePeriod()->getStartDate()->getDateTimeString())) // BT-73-00
+                    ->setEndDateTime(new EndDateTime($invoice->getInvoicePeriod()->getEndDate()->getDateTimeString())) // BT-74-00
+            )
+            ->setInvoiceReferencedDocuments([]) // BG-3
+            ->setPayeeTradeParty(null) // BG-10
+            ->setSpecifiedTradePaymentTerms(null) // BG-20-00
+            ->setPaymentReference(null) // BT-83
+            ->setCreditorReferenceIdentifier(null) // BT-90
+            ->setReceivableSpecifiedTradeAccountingAccount(null) // BT-19-00
+            ->setSpecifiedTradeAllowances([]) // BG-20
+            ->setSpecifiedTradeCharges([]) // BG-21
+            ->setSpecifiedTradeSettlementPaymentMeans([]) // BG-16
+            ->setTaxCurrencyCode($invoice->getTaxCurrencyCode()) // BT-6
+        ;
     }
 
     /**
