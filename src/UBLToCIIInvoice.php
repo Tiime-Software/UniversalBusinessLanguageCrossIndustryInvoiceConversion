@@ -9,6 +9,7 @@ use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeDelivery;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeSettlement;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\BuyerTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ExchangedDocument;
+use Tiime\CrossIndustryInvoice\DataType\BasicWL\PayeeSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PostalTradeAddress;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerTradeParty;
@@ -21,6 +22,7 @@ use Tiime\CrossIndustryInvoice\DataType\CategoryTradeTax;
 use Tiime\CrossIndustryInvoice\DataType\DefinedTradeContact;
 use Tiime\CrossIndustryInvoice\DataType\DespatchAdviceReferencedDocument;
 use Tiime\CrossIndustryInvoice\DataType\DocumentIncludedNote;
+use Tiime\CrossIndustryInvoice\DataType\DueDateDateTime;
 use Tiime\CrossIndustryInvoice\DataType\EmailURIUniversalCommunication;
 use Tiime\CrossIndustryInvoice\DataType\EN16931\BuyerSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\EndDateTime;
@@ -28,16 +30,21 @@ use Tiime\CrossIndustryInvoice\DataType\ExchangedDocumentContext;
 use Tiime\CrossIndustryInvoice\DataType\GuidelineSpecifiedDocumentContextParameter;
 use Tiime\CrossIndustryInvoice\DataType\IssueDateTime;
 use Tiime\CrossIndustryInvoice\DataType\OccurrenceDateTime;
+use Tiime\CrossIndustryInvoice\DataType\PayeeGlobalIdentifier;
+use Tiime\CrossIndustryInvoice\DataType\PayeeTradeParty;
+use Tiime\CrossIndustryInvoice\DataType\ReceivableSpecifiedTradeAccountingAccount;
 use Tiime\CrossIndustryInvoice\DataType\SellerGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\SellerTaxRepresentativeTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\ShipToTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTaxRegistrationVA;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradeCharge;
+use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradePaymentTerms;
 use Tiime\CrossIndustryInvoice\DataType\StartDateTime;
 use Tiime\CrossIndustryInvoice\DataType\TaxTotalAmount;
 use Tiime\CrossIndustryInvoice\DataType\TelephoneUniversalCommunication;
 use Tiime\CrossIndustryInvoice\DataType\URIUniversalCommunication;
 use Tiime\EN16931\Codelist\InvoiceTypeCodeUNTDID1001;
+use Tiime\EN16931\DataType\Identifier\BankAssignedCreditorIdentifier;
 use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
 use Tiime\EN16931\DataType\Identifier\VatIdentifier;
@@ -329,11 +336,21 @@ class UBLToCIIInvoice
                     ->setEndDateTime(new EndDateTime($invoice->getInvoicePeriod()->getEndDate()->getDateTimeString())) // BT-74-00
             )
             ->setInvoiceReferencedDocuments([]) // BG-3
-            ->setPayeeTradeParty(null) // BG-10
-            ->setSpecifiedTradePaymentTerms(null) // BG-20-00
-            ->setPaymentReference(null) // BT-83
-            ->setCreditorReferenceIdentifier(null) // BT-90
-            ->setReceivableSpecifiedTradeAccountingAccount(null) // BT-19-00
+            ->setPayeeTradeParty(self::getPayeeTradeParty($invoice)) // BG-10
+            ->setSpecifiedTradePaymentTerms( // BT-20-00
+                (new SpecifiedTradePaymentTerms())
+                    ->setDescription($invoice->getPaymentTerms()?->getNote()) // BT-20
+                    ->setDueDateDateTime(new DueDateDateTime($invoice->getDueDate()->getDateTimeString())) // BT-9-00
+            )
+            ->setPaymentReference(null) // BT-83, TODO : à implémenter en fonction des cardinalités à clarifier
+            ->setCreditorReferenceIdentifier( // BT-90
+                null === $invoice->getPayeeParty()?->getPartyBACIdentification()?->getBankAssignedCreditorIdentifier() ? null :
+                new BankAssignedCreditorIdentifier($invoice->getPayeeParty()->getPartyBACIdentification()->getBankAssignedCreditorIdentifier())
+            )
+            ->setReceivableSpecifiedTradeAccountingAccount(
+                null === $invoice->getAccountingCost() ? null :
+                new ReceivableSpecifiedTradeAccountingAccount($invoice->getAccountingCost())
+            ) // BT-19-00
             ->setSpecifiedTradeAllowances([]) // BG-20
             ->setSpecifiedTradeCharges([]) // BG-21
             ->setSpecifiedTradeSettlementPaymentMeans([]) // BG-16
@@ -382,5 +399,30 @@ class UBLToCIIInvoice
                 ->setReason($charge->getChargeReason()), // BT-104
             $invoice->getCharges()
         );
+    }
+
+    /**
+     * BG-10.
+     */
+    private static function getPayeeTradeParty(UniversalBusinessLanguage $invoice): ?PayeeTradeParty
+    {
+        $buyerIdentifier = $invoice->getPayeeParty()->getPartyIdentification()->getBuyerIdentifier();
+
+        return null === $invoice->getPayeeParty() ? null :
+            (new PayeeTradeParty($invoice->getPayeeParty()->getPartyName()->getName()))
+                ->setIdentifier( // BT-60
+                    null === $buyerIdentifier->scheme ? $buyerIdentifier : null
+                )
+                ->setGlobalIdentifier( // BT-60-0 & BT-60-1
+                    null !== $buyerIdentifier->scheme ? new PayeeGlobalIdentifier(
+                        $buyerIdentifier->value,
+                        $buyerIdentifier->scheme
+                    ) : null
+                )
+                ->setSpecifiedLegalOrganization( // BT-61-00
+                    null === $invoice->getPayeeParty()->getPartyLegalEntity() ? null :
+                        (new PayeeSpecifiedLegalOrganization())
+                            ->setIdentifier($invoice->getPayeeParty()->getPartyLegalEntity()->getIdentifier())
+                );
     }
 }
