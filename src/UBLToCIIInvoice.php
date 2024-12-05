@@ -4,6 +4,7 @@ namespace Tiime\UniversalBusinessLanguageCrossIndustryInvoiceConversion;
 
 use Tiime\CrossIndustryInvoice\BasicWL\CrossIndustryInvoice as BasicWLCrossIndustryInvoice;
 use Tiime\CrossIndustryInvoice\DataType\ActualDeliverySupplyChainEvent;
+use Tiime\CrossIndustryInvoice\DataType\Basic\ApplicableTradeTax;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeAgreement;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeDelivery;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeSettlement;
@@ -37,6 +38,7 @@ use Tiime\CrossIndustryInvoice\DataType\SellerGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\SellerTaxRepresentativeTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\ShipToTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTaxRegistrationVA;
+use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradeAllowance;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradeCharge;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradePaymentTerms;
 use Tiime\CrossIndustryInvoice\DataType\StartDateTime;
@@ -50,6 +52,7 @@ use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
 use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\EN16931\DataType\Reference\DespatchAdviceReference;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\SellerPartyIdentification;
+use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\TaxSubtotal;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\UniversalBusinessLanguage;
 
 class UBLToCIIInvoice
@@ -328,7 +331,7 @@ class UBLToCIIInvoice
         return (new ApplicableHeaderTradeSettlement( // BG-19
             invoiceCurrencyCode: $invoice->getTaxCurrencyCode(),
             specifiedTradeSettlementHeaderMonetarySummation: self::getSpecifiedTradeSettlementHeaderMonetarySummation($invoice), // BG-22
-            applicableTradeTaxes: self::getApplicableTradeTaxes($invoice), // BG-21
+            applicableTradeTaxes: self::getApplicableTradeTaxes($invoice), // BG-23
         ))
             ->setBillingSpecifiedPeriod( // BG-14
                 (new BillingSpecifiedPeriod())
@@ -351,8 +354,8 @@ class UBLToCIIInvoice
                 null === $invoice->getAccountingCost() ? null :
                 new ReceivableSpecifiedTradeAccountingAccount($invoice->getAccountingCost())
             ) // BT-19-00
-            ->setSpecifiedTradeAllowances([]) // BG-20
-            ->setSpecifiedTradeCharges([]) // BG-21
+            ->setSpecifiedTradeAllowances(self::getSpecifiedTradeAllowances($invoice)) // BG-20
+            ->setSpecifiedTradeCharges(self::getSpecifiedTradeCharges($invoice)) // BG-21
             ->setSpecifiedTradeSettlementPaymentMeans([]) // BG-16
             ->setTaxCurrencyCode($invoice->getTaxCurrencyCode()) // BT-6
         ;
@@ -382,23 +385,28 @@ class UBLToCIIInvoice
     }
 
     /**
-     * BG-21.
+     * BG-23.
      *
-     * @return SpecifiedTradeCharge[]
+     * @return ApplicableTradeTax[]
      */
     private static function getApplicableTradeTaxes(UniversalBusinessLanguage $invoice): array
     {
-        return array_map(
-            static fn ($charge) => (new SpecifiedTradeCharge(
-                actualAmount: $charge->getAmount()->getValue()->getValue(), // BT-99
-                categoryTradeTax: new CategoryTradeTax($charge->getTaxCategory()->getVatCategory()), // BT-102-00
-            ))
-                ->setCalculationPercent($charge->getMultiplierFactorNumeric()->getValue()) // BT-101
-                ->setBasisAmount($charge->getBaseAmount()?->getValue()->getValue()) // BT-100
-                ->setReasonCode($charge->getChargeReasonCode()) // BT-105
-                ->setReason($charge->getChargeReason()), // BT-104
-            $invoice->getCharges()
-        );
+        $applicableTradeTaxes = [];
+
+        foreach ($invoice->getTaxTotals() as $taxTotal) {
+            if ([] === $taxTotal->getTaxSubtotals()) {
+                continue;
+            }
+
+            $applicableTradeTaxes = array_map(
+                static fn (TaxSubtotal $taxSubtotal) => (new ApplicableTradeTax(
+                    categoryCode: $taxSubtotal->getTaxCategory()->getVatCategory()// BT-151
+                ))->setRateApplicablePercent($taxSubtotal->getTaxCategory()->getPercent()), // BT-152
+                $taxTotal->getTaxSubtotals()
+            );
+        }
+
+        return $applicableTradeTaxes;
     }
 
     /**
@@ -424,5 +432,50 @@ class UBLToCIIInvoice
                         (new PayeeSpecifiedLegalOrganization())
                             ->setIdentifier($invoice->getPayeeParty()->getPartyLegalEntity()->getIdentifier())
                 );
+    }
+
+    /**
+     * BG-20.
+     *
+     * @return SpecifiedTradeAllowance[]
+     */
+    private static function getSpecifiedTradeAllowances(UniversalBusinessLanguage $invoice): array
+    {
+        return array_map(
+            static fn ($allowance) => (new SpecifiedTradeAllowance(
+                actualAmount: $allowance->getAmount()->getValue()->getValue(), // BT-92
+                allowanceCategoryTradeTax: (new CategoryTradeTax( // BT-95-00
+                    $allowance->getTaxCategory()->getVatCategory()) // BT-95
+                )
+                    ->setRateApplicablePercent($allowance->getTaxCategory()->getPercent()) // BT-96
+            ))
+                ->setBasisAmount($allowance->getBaseAmount()?->getValue()->getValue()) // BT-93
+                ->setCalculationPercent($allowance->getMultiplierFactorNumeric()->getValue()) // BT-94
+                ->setReason($allowance->getAllowanceReason()) // BT-97
+                ->setReasonCode($allowance->getAllowanceReasonCode()), // BT-98
+            $invoice->getAllowances()
+        );
+    }
+
+    /**
+     * BG-21.
+     *
+     * @return SpecifiedTradeCharge[]
+     */
+    private static function getSpecifiedTradeCharges(UniversalBusinessLanguage $invoice): array
+    {
+        return array_map(
+            static fn ($charge) => (new SpecifiedTradeCharge(
+                actualAmount: $charge->getAmount()->getValue()->getValue(), // BT-99
+                categoryTradeTax: new CategoryTradeTax( // BT-102-00
+                    $charge->getTaxCategory()->getVatCategory() // BT-102
+                ),
+            ))
+                ->setCalculationPercent($charge->getMultiplierFactorNumeric()->getValue()) // BT-101
+                ->setBasisAmount($charge->getBaseAmount()?->getValue()->getValue()) // BT-100
+                ->setReasonCode($charge->getChargeReasonCode()) // BT-105
+                ->setReason($charge->getChargeReason()), // BT-104
+            $invoice->getCharges()
+        );
     }
 }
