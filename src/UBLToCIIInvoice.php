@@ -10,11 +10,13 @@ use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeDelivery;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeSettlement;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\BuyerTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ExchangedDocument;
+use Tiime\CrossIndustryInvoice\DataType\BasicWL\PayeePartyCreditorFinancialAccount;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PayeeSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PostalTradeAddress;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SpecifiedTradeSettlementHeaderMonetarySummation;
+use Tiime\CrossIndustryInvoice\DataType\BasicWL\SpecifiedTradeSettlementPaymentMeans;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SupplyChainTradeTransaction;
 use Tiime\CrossIndustryInvoice\DataType\BillingSpecifiedPeriod;
 use Tiime\CrossIndustryInvoice\DataType\BusinessProcessSpecifiedDocumentContextParameter;
@@ -33,6 +35,7 @@ use Tiime\CrossIndustryInvoice\DataType\IssueDateTime;
 use Tiime\CrossIndustryInvoice\DataType\OccurrenceDateTime;
 use Tiime\CrossIndustryInvoice\DataType\PayeeGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\PayeeTradeParty;
+use Tiime\CrossIndustryInvoice\DataType\PayerPartyDebtorFinancialAccount;
 use Tiime\CrossIndustryInvoice\DataType\ReceivableSpecifiedTradeAccountingAccount;
 use Tiime\CrossIndustryInvoice\DataType\SellerGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\SellerTaxRepresentativeTradeParty;
@@ -51,6 +54,7 @@ use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
 use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\EN16931\DataType\Reference\DespatchAdviceReference;
+use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\PaymentMeans;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\SellerPartyIdentification;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\TaxSubtotal;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\UniversalBusinessLanguage;
@@ -356,7 +360,7 @@ class UBLToCIIInvoice
             ) // BT-19-00
             ->setSpecifiedTradeAllowances(self::getSpecifiedTradeAllowances($invoice)) // BG-20
             ->setSpecifiedTradeCharges(self::getSpecifiedTradeCharges($invoice)) // BG-21
-            ->setSpecifiedTradeSettlementPaymentMeans([]) // BG-16
+            ->setSpecifiedTradeSettlementPaymentMeans(self::getSpecifiedTradeSettlementPaymentMeans($invoice)) // BG-16
             ->setTaxCurrencyCode($invoice->getTaxCurrencyCode()) // BT-6
         ;
     }
@@ -477,5 +481,29 @@ class UBLToCIIInvoice
                 ->setReason($charge->getChargeReason()), // BT-104
             $invoice->getCharges()
         );
+    }
+
+    /**
+     * BG-16.
+     *
+     * @return SpecifiedTradeSettlementPaymentMeans[]
+     */
+    private static function getSpecifiedTradeSettlementPaymentMeans(UniversalBusinessLanguage $invoice): array
+    {
+        return array_map(
+            static fn (PaymentMeans $paymentMeans) => (new SpecifiedTradeSettlementPaymentMeans(
+                typeCode: $paymentMeans->getPaymentMeansCode()->getPaymentMeansCode() // BT-81
+            ))
+                ->setPayerPartyDebtorFinancialAccount( // BT-91-00
+                    payerPartyDebtorFinancialAccount: null === $paymentMeans->getPaymentMandate()?->getPayerFinancialAccount()?->getIdentifier() ? null :
+                    new PayerPartyDebtorFinancialAccount($paymentMeans->getPaymentMandate()->getPayerFinancialAccount()->getIdentifier()) // BT-91
+                )
+                ->setPayeePartyCreditorFinancialAccount( // BG-17
+                    payeePartyCreditorFinancialAccount: null === $paymentMeans->getPayeeFinancialAccount()?->getPaymentAccountIdentifier() ? null :
+                    (new PayeePartyCreditorFinancialAccount())
+                        ->setIbanIdentifier($paymentMeans->getPayeeFinancialAccount()?->getPaymentAccountIdentifier()) // BT-84
+                ),
+            $invoice->getPaymentMeans())
+        ;
     }
 }
