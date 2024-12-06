@@ -10,6 +10,7 @@ use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeDelivery;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeSettlement;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\BuyerTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ExchangedDocument;
+use Tiime\CrossIndustryInvoice\DataType\BasicWL\HeaderApplicableTradeTax;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PayeePartyCreditorFinancialAccount;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PayeeSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PostalTradeAddress;
@@ -32,6 +33,7 @@ use Tiime\CrossIndustryInvoice\DataType\EndDateTime;
 use Tiime\CrossIndustryInvoice\DataType\ExchangedDocumentContext;
 use Tiime\CrossIndustryInvoice\DataType\GuidelineSpecifiedDocumentContextParameter;
 use Tiime\CrossIndustryInvoice\DataType\IssueDateTime;
+use Tiime\CrossIndustryInvoice\DataType\LocationGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\OccurrenceDateTime;
 use Tiime\CrossIndustryInvoice\DataType\PayeeGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\PayeeTradeParty;
@@ -131,7 +133,7 @@ class UBLToCIIInvoice
             ->setSellerTaxRepresentativeTradeParty( // BG-11
                 null === $invoice->getTaxRepresentativeParty() ? null :
                 new SellerTaxRepresentativeTradeParty(
-                    $invoice->getTaxRepresentativeParty()?->getPartyName(), // BT-62
+                    $invoice->getTaxRepresentativeParty()?->getPartyName()->getName(), // BT-62
                     (new PostalTradeAddress( // BG-12
                         $invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountry()->getIdentificationCode()) // BT-69
                     )
@@ -225,19 +227,17 @@ class UBLToCIIInvoice
         ))
             ->setIdentifiers( // BT-90 + BT-29
                 array_map(
-                    static fn (SellerPartyIdentification $partyIdentification) => null === $partyIdentification->getSellerIdentifier()->scheme ?
-                    $partyIdentification->getSellerIdentifier()
-                    : null,
-                    $sellerParty->getPartyIdentifications()
+                    static fn (SellerPartyIdentification $partyIdentification) => $partyIdentification->getSellerIdentifier(),
+                    array_filter($sellerParty->getPartyIdentifications(), fn ($scheme) => null === $scheme->getSellerIdentifier()->scheme)
                 )
             )
             ->setGlobalIdentifiers( // BT-90 + BT-29
                 array_map(
-                    static fn (SellerPartyIdentification $partyIdentification) => isset($partyIdentification->getSellerIdentifier()->scheme) ? new SellerGlobalIdentifier(
+                    static fn (SellerPartyIdentification $partyIdentification) => new SellerGlobalIdentifier(
                         $partyIdentification->getSellerIdentifier()->value,
                         $partyIdentification->getSellerIdentifier()->scheme
-                    ) : null,
-                    $sellerParty->getPartyIdentifications()
+                    ),
+                    array_filter($sellerParty->getPartyIdentifications(), fn ($scheme) => null !== $scheme->getSellerIdentifier()->scheme)
                 )
             )
             ->setSpecifiedLegalOrganization( // BT-30
@@ -307,12 +307,15 @@ class UBLToCIIInvoice
 
         return (new ShipToTradeParty())
             ->setIdentifier( // BT-71
-                null === $delivery->getDeliveryLocation()?->getIdentifier()->scheme ?
+                null === $delivery->getDeliveryLocation()?->getIdentifier()?->scheme ?
                 $delivery->getDeliveryLocation()?->getIdentifier() : null
             )
             ->setGlobalIdentifier( // BT-71-0 & BT-71-1
-                null !== $delivery->getDeliveryLocation()?->getIdentifier()->scheme ?
-                    $delivery->getDeliveryLocation()?->getIdentifier() : null
+                null !== $delivery->getDeliveryLocation()?->getIdentifier()?->scheme ?
+                    new LocationGlobalIdentifier(
+                        $delivery->getDeliveryLocation()?->getIdentifier()?->value,
+                        $delivery->getDeliveryLocation()?->getIdentifier()?->scheme
+                    ) : null
             )
             ->setName($delivery->getDeliveryParty()?->getPartyName()->getName()) // BT-70
             ->setPostalTradeAddress( // BG-15
@@ -351,8 +354,8 @@ class UBLToCIIInvoice
             )
             ->setPaymentReference(null) // BT-83, TODO : à implémenter en fonction des cardinalités à clarifier
             ->setCreditorReferenceIdentifier( // BT-90
-                null === $invoice->getPayeeParty()?->getPartyBACIdentification()?->getBankAssignedCreditorIdentifier() ? null :
-                new BankAssignedCreditorIdentifier($invoice->getPayeeParty()->getPartyBACIdentification()->getBankAssignedCreditorIdentifier())
+                null === $invoice->getPayeeParty()?->getPartyBankAssignedCreditorIdentification()?->getBankAssignedCreditorIdentifier() ? null :
+                new BankAssignedCreditorIdentifier($invoice->getPayeeParty()->getPartyBankAssignedCreditorIdentification()->getBankAssignedCreditorIdentifier())
             )
             ->setReceivableSpecifiedTradeAccountingAccount(
                 null === $invoice->getAccountingCost() ? null :
@@ -403,9 +406,15 @@ class UBLToCIIInvoice
             }
 
             $applicableTradeTaxes = array_map(
-                static fn (TaxSubtotal $taxSubtotal) => (new ApplicableTradeTax(
-                    categoryCode: $taxSubtotal->getTaxCategory()->getVatCategory()// BT-151
-                ))->setRateApplicablePercent($taxSubtotal->getTaxCategory()->getPercent()), // BT-152
+                static fn (TaxSubtotal $taxSubtotal) => (new HeaderApplicableTradeTax(
+                    calculatedAmount: $taxSubtotal->getTaxAmount()->getValue()->getValue(), // BT-117
+                    basisAmount: $taxSubtotal->getTaxableAmount()->getValue()->getValue(), // BT-116
+                    categoryCode: $taxSubtotal->getTaxCategory()->getVatCategory() // BT-118
+                ))
+                    ->setExemptionReason($taxSubtotal->getTaxCategory()->getTaxExemptionReason()) // BT-120
+                    ->setExemptionReasonCode($taxSubtotal->getTaxCategory()->getTaxExemptionReasonCode()) // BT-121
+                    ->setRateApplicablePercent($taxSubtotal->getTaxCategory()->getPercent()->getValue()) // BT-119
+                ,
                 $taxTotal->getTaxSubtotals()
             );
         }
@@ -418,7 +427,7 @@ class UBLToCIIInvoice
      */
     private static function getPayeeTradeParty(UniversalBusinessLanguage $invoice): ?PayeeTradeParty
     {
-        $buyerIdentifier = $invoice->getPayeeParty()->getPartyIdentification()->getBuyerIdentifier();
+        $buyerIdentifier = $invoice->getPayeeParty()?->getPartyIdentification()?->getBuyerIdentifier();
 
         return null === $invoice->getPayeeParty() ? null :
             (new PayeeTradeParty($invoice->getPayeeParty()->getPartyName()->getName()))
