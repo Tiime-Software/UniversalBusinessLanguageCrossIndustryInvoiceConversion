@@ -56,6 +56,7 @@ use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
 use Tiime\EN16931\DataType\Identifier\VatIdentifier;
 use Tiime\EN16931\DataType\Reference\DespatchAdviceReference;
+use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\Allowance;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\PaymentMeans;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\SellerPartyIdentification;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\TaxSubtotal;
@@ -157,7 +158,7 @@ class UBLToCIIInvoice
         $buyerParty = $invoice->getAccountingCustomerParty()->getParty();
 
         return (new BuyerTradeParty( // BG-7
-            name: $buyerParty->getPartyName()->getName(),
+            name: $buyerParty->getPartyLegalEntity()?->getRegistrationName(), // BT-44
             postalTradeAddress: (new PostalTradeAddress(countryID: $buyerParty->getPostalAddress()->getCountry()->getIdentificationCode()))
                 ->setLineOne($buyerParty->getPostalAddress()->getStreetName()) // BT-50
                 ->setLineTwo($buyerParty->getPostalAddress()->getAdditionalStreetName()) // BT-51
@@ -184,15 +185,17 @@ class UBLToCIIInvoice
                     ->setTradingBusinessName($buyerParty->getPartyLegalEntity()->getRegistrationName())
             )
             ->setSpecifiedTaxRegistrationVA( // BT-48
+                null === $buyerParty->getPartyTaxScheme() ? null :
                 new SpecifiedTaxRegistrationVA(
                     new VatIdentifier($buyerParty->getPartyTaxScheme()->getTaxScheme()->getIdentifier())
                 )
             )
             ->setURIUniversalCommunication( // BT-49
+                null === $buyerParty->getEndpointIdentifier() ? null :
                 new URIUniversalCommunication(
                     new ElectronicAddressIdentifier(
-                        $buyerParty->getEndpointIdentifier()?->value,
-                        $buyerParty->getEndpointIdentifier()?->scheme
+                        $buyerParty->getEndpointIdentifier()->value,
+                        $buyerParty->getEndpointIdentifier()->scheme
                     )
                 )
             )
@@ -216,7 +219,7 @@ class UBLToCIIInvoice
         $sellerParty = $invoice->getAccountingSupplierParty()->getParty();
 
         return (new SellerTradeParty( // BG-4
-            name: $sellerParty->getPartyName()->getName(),
+            name: $sellerParty->getPartyLegalEntity()?->getRegistrationName(),
             postalTradeAddress: (new PostalTradeAddress(countryID: $sellerParty->getPostalAddress()->getCountry()->getIdentificationCode()))
                 ->setLineOne($sellerParty->getPostalAddress()->getStreetName()) // BT-35
                 ->setLineTwo($sellerParty->getPostalAddress()->getAdditionalStreetName()) // BT-36
@@ -255,10 +258,11 @@ class UBLToCIIInvoice
                     )
             )
             ->setURIUniversalCommunication( // BT-34
+                null === $sellerParty->getEndpointIdentifier() ? null :
                 new URIUniversalCommunication(
                     new ElectronicAddressIdentifier(
-                        $sellerParty->getEndpointIdentifier()?->value,
-                        $sellerParty->getEndpointIdentifier()?->scheme
+                        $sellerParty->getEndpointIdentifier()->value,
+                        $sellerParty->getEndpointIdentifier()->scheme
                     )
                 )
             )
@@ -319,10 +323,11 @@ class UBLToCIIInvoice
             )
             ->setName($delivery->getDeliveryParty()?->getPartyName()->getName()) // BT-70
             ->setPostalTradeAddress( // BG-15
+                null === $delivery->getDeliveryLocation()?->getAddress() ? null :
                 (new PostalTradeAddress($delivery->getDeliveryLocation()->getAddress()->getCountry()->getIdentificationCode()))
                     ->setLineOne($delivery->getDeliveryLocation()->getAddress()->getStreetName()) // BT-75
                     ->setLineTwo($delivery->getDeliveryLocation()->getAddress()->getAdditionalStreetName()) // BT-76
-                    ->setLineThree($delivery->getDeliveryLocation()->getAddress()->getAddressLine()->getLine()) // BT-163
+                    ->setLineThree($delivery->getDeliveryLocation()->getAddress()->getAddressLine()?->getLine()) // BT-163
                     ->setCityName($delivery->getDeliveryLocation()->getAddress()->getCityName()) // BT-77
                     ->setPostcodeCode($delivery->getDeliveryLocation()->getAddress()->getPostalZone()) // BT-78
                     ->setCountrySubDivisionName($delivery->getDeliveryLocation()->getAddress()->getCountrySubentity()) // BT-79
@@ -336,14 +341,21 @@ class UBLToCIIInvoice
     private static function getApplicableHeaderTradeSettlement(UniversalBusinessLanguage $invoice): ApplicableHeaderTradeSettlement
     {
         return (new ApplicableHeaderTradeSettlement( // BG-19
-            invoiceCurrencyCode: $invoice->getTaxCurrencyCode(),
+            invoiceCurrencyCode: $invoice->getDocumentCurrencyCode(),
             specifiedTradeSettlementHeaderMonetarySummation: self::getSpecifiedTradeSettlementHeaderMonetarySummation($invoice), // BG-22
             applicableTradeTaxes: self::getApplicableTradeTaxes($invoice), // BG-23
         ))
             ->setBillingSpecifiedPeriod( // BG-14
+                null === $invoice->getInvoicePeriod() ? null :
                 (new BillingSpecifiedPeriod())
-                    ->setStartDateTime(new StartDateTime($invoice->getInvoicePeriod()->getStartDate()->getDateTimeString())) // BT-73-00
-                    ->setEndDateTime(new EndDateTime($invoice->getInvoicePeriod()->getEndDate()->getDateTimeString())) // BT-74-00
+                    ->setStartDateTime( // BT-73-00
+                        null === $invoice->getInvoicePeriod()->getStartDate() ? null :
+                        new StartDateTime($invoice->getInvoicePeriod()->getStartDate()->getDateTimeString())
+                    )
+                    ->setEndDateTime( // BT-74-00
+                        null === $invoice->getInvoicePeriod()->getEndDate() ? null :
+                        new EndDateTime($invoice->getInvoicePeriod()->getEndDate()->getDateTimeString())
+                    )
             )
             ->setInvoiceReferencedDocuments([]) // BG-3
             ->setPayeeTradeParty(self::getPayeeTradeParty($invoice)) // BG-10
@@ -413,8 +425,9 @@ class UBLToCIIInvoice
                 ))
                     ->setExemptionReason($taxSubtotal->getTaxCategory()->getTaxExemptionReason()) // BT-120
                     ->setExemptionReasonCode($taxSubtotal->getTaxCategory()->getTaxExemptionReasonCode()) // BT-121
-                    ->setRateApplicablePercent($taxSubtotal->getTaxCategory()->getPercent()->getValue()) // BT-119
-                ,
+                    ->setRateApplicablePercent( // BT-119
+                        $taxSubtotal->getTaxCategory()->getPercent()?->getValue()
+                    ),
                 $taxTotal->getTaxSubtotals()
             );
         }
@@ -455,7 +468,7 @@ class UBLToCIIInvoice
     private static function getSpecifiedTradeAllowances(UniversalBusinessLanguage $invoice): array
     {
         return array_map(
-            static fn ($allowance) => (new SpecifiedTradeAllowance(
+            static fn (Allowance $allowance) => (new SpecifiedTradeAllowance(
                 actualAmount: $allowance->getAmount()->getValue()->getValue(), // BT-92
                 allowanceCategoryTradeTax: (new CategoryTradeTax( // BT-95-00
                     $allowance->getTaxCategory()->getVatCategory()) // BT-95
@@ -484,7 +497,7 @@ class UBLToCIIInvoice
                     $charge->getTaxCategory()->getVatCategory() // BT-102
                 ),
             ))
-                ->setCalculationPercent($charge->getMultiplierFactorNumeric()->getValue()) // BT-101
+                ->setCalculationPercent($charge->getMultiplierFactorNumeric()?->getValue()) // BT-101
                 ->setBasisAmount($charge->getBaseAmount()?->getValue()->getValue()) // BT-100
                 ->setReasonCode($charge->getChargeReasonCode()) // BT-105
                 ->setReason($charge->getChargeReason()), // BT-104

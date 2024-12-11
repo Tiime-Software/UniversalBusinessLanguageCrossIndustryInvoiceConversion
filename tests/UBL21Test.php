@@ -22,6 +22,7 @@ class UBL21Test extends TestCase
         $document->loadXML($content);
 
         $invoice = UniversalBusinessLanguage::fromXML($document);
+
         $this->assertInstanceOf(UniversalBusinessLanguage::class, $invoice);
 
         $cii = UBLToCIIInvoice::convert($invoice);
@@ -33,6 +34,17 @@ class UBL21Test extends TestCase
     {
         return [
             ['ubl21_fullcontent'],
+            ['UBL21Invoice'],
+            ['UBL21Invoice_V7_01'],
+            ['UBL21Invoice_V7_02'],
+            ['UBL21Invoice_V7_03'],
+            ['UBL21Invoice_V7_04'],
+            ['UBL21Invoice_V7_05'],
+            ['UBL21Invoice_V7_07'],
+            ['UBL21Invoice_V7_08'],
+            ['UBL21Invoice_V7_09'],
+            ['UBL21Invoice_V7_10'],
+            ['UBL21Invoice_V7_11'],
         ];
     }
 }
