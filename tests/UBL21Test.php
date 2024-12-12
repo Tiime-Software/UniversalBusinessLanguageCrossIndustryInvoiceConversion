@@ -27,6 +27,8 @@ class UBL21Test extends TestCase
 
         $cii = UBLToCIIInvoice::convert($invoice);
 
+        file_put_contents(__DIR__ . '/Fixtures/CII/' . $filename . '.xml', $cii->toXML()->saveXML());
+
         $this->assertInstanceOf(CrossIndustryInvoice::class, $cii);
     }
 
