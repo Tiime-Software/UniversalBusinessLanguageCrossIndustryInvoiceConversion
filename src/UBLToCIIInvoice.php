@@ -33,7 +33,9 @@ use Tiime\CrossIndustryInvoice\DataType\EmailURIUniversalCommunication;
 use Tiime\CrossIndustryInvoice\DataType\EN16931\BuyerSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\EndDateTime;
 use Tiime\CrossIndustryInvoice\DataType\ExchangedDocumentContext;
+use Tiime\CrossIndustryInvoice\DataType\FormattedIssueDateTime;
 use Tiime\CrossIndustryInvoice\DataType\GuidelineSpecifiedDocumentContextParameter;
+use Tiime\CrossIndustryInvoice\DataType\InvoiceReferencedDocument;
 use Tiime\CrossIndustryInvoice\DataType\IssueDateTime;
 use Tiime\CrossIndustryInvoice\DataType\LocationGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\OccurrenceDateTime;
@@ -59,6 +61,7 @@ use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
 use Tiime\EN16931\DataType\Reference\ContractReference;
 use Tiime\EN16931\DataType\Reference\DespatchAdviceReference;
+use Tiime\EN16931\DataType\Reference\PrecedingInvoiceReference;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\Allowance;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\PaymentMeans;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\SellerPartyIdentification;
@@ -375,12 +378,27 @@ class UBLToCIIInvoice
                         new EndDateTime($invoice->getInvoicePeriod()->getEndDate()->getDateTimeString())
                     )
             )
-            ->setInvoiceReferencedDocuments([]) // BG-3
+            ->setInvoiceReferencedDocuments(
+                array_map(
+                    static fn ($invoiceReference) => (new InvoiceReferencedDocument(
+                        new PrecedingInvoiceReference($invoiceReference->getInvoiceDocumentReference()->getIssuerAssignedIdentifier()->value)
+                    ))
+                        ->setFormattedIssueDateTime(
+                            null === $invoiceReference->getInvoiceDocumentReference()->getIssueDate() ? null :
+                            new FormattedIssueDateTime($invoiceReference->getInvoiceDocumentReference()->getIssueDate()->getDateTimeString())
+                        ),
+                    $invoice->getBillingReferences()
+                )
+            ) // BG-3
             ->setPayeeTradeParty(self::getPayeeTradeParty($invoice)) // BG-10
             ->setSpecifiedTradePaymentTerms( // BT-20-00
                 (new SpecifiedTradePaymentTerms())
                     ->setDescription($invoice->getPaymentTerms()?->getNote()) // BT-20
                     ->setDueDateDateTime(new DueDateDateTime($invoice->getDueDate()->getDateTimeString())) // BT-9-00
+                    ->setDirectDebitMandateIdentifier( // BT-89
+                        null === $invoice->getPaymentMeans()[0]?->getPaymentMandate() ? null :
+                        $invoice->getPaymentMeans()[0]->getPaymentMandate()->getIdentifier()
+                    )
             )
             ->setPaymentReference(
                 \count($invoice->getPaymentMeans()) > 0 ? $invoice->getPaymentMeans()[0]->getPaymentIdentifier() : null
@@ -497,7 +515,7 @@ class UBLToCIIInvoice
                     ->setRateApplicablePercent($allowance->getTaxCategory()->getPercent()) // BT-96
             ))
                 ->setBasisAmount($allowance->getBaseAmount()?->getValue()->getValue()) // BT-93
-                ->setCalculationPercent($allowance->getMultiplierFactorNumeric()->getValue()) // BT-94
+                ->setCalculationPercent($allowance->getMultiplierFactorNumeric()?->getValue()) // BT-94
                 ->setReason($allowance->getAllowanceReason()) // BT-97
                 ->setReasonCode($allowance->getAllowanceReasonCode()), // BT-98
             $invoice->getAllowances()

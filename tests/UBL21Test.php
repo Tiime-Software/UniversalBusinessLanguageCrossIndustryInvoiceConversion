@@ -14,11 +14,11 @@ use Tiime\UniversalBusinessLanguageCrossIndustryInvoiceConversion\UBLToCIIInvoic
 class UBL21Test extends TestCase
 {
     #[TestDox('Create CII BasicWL Invoices from UBL 2.1')]
-    #[DataProvider('provideUBL21Files')]
-    public function testCreateCIIFromUBL21(string $filename): void
+    #[DataProvider('provideUBL21FromEN16931Files')]
+    public function testCreateCIIFromUBL21GeneratedByEN16931(string $filename): void
     {
         $document = new \DOMDocument();
-        $content  = file_get_contents(__DIR__ . '/Fixtures/ubl21/' . $filename . '.xml');
+        $content  = file_get_contents(__DIR__ . '/Fixtures/UBL21/EN16931/' . $filename . '.xml');
         $document->loadXML($content);
 
         $invoice = UniversalBusinessLanguage::fromXML($document);
@@ -27,15 +27,14 @@ class UBL21Test extends TestCase
 
         $cii = UBLToCIIInvoice::convert($invoice);
 
-        file_put_contents(__DIR__ . '/Fixtures/CII/' . $filename . '.xml', $cii->toXML()->saveXML());
+        file_put_contents(__DIR__ . '/Fixtures/CII/EN16931/' . $filename . '.xml', $cii->toXML()->saveXML());
 
         $this->assertInstanceOf(CrossIndustryInvoice::class, $cii);
     }
 
-    public static function provideUBL21Files(): array
+    public static function provideUBL21FromEN16931Files(): array
     {
         return [
-            ['ubl21_fullcontent'],
             ['UBL21Invoice'],
             ['UBL21Invoice_V7_01'],
             ['UBL21Invoice_V7_02'],
@@ -47,6 +46,42 @@ class UBL21Test extends TestCase
             ['UBL21Invoice_V7_09'],
             ['UBL21Invoice_V7_10'],
             ['UBL21Invoice_V7_11'],
+        ];
+    }
+
+    #[TestDox('Create CII BasicWL Invoices from UBL 2.1')]
+    #[DataProvider('provideUBL21FromBasicWLFiles')]
+    public function testCreateCIIFromUBL21GeneratedByBasicWL(string $filename): void
+    {
+        $document = new \DOMDocument();
+        $content  = file_get_contents(__DIR__ . '/Fixtures/UBL21/BasicWL/' . $filename . '.xml');
+        $document->loadXML($content);
+
+        $invoice = UniversalBusinessLanguage::fromXML($document);
+
+        $this->assertInstanceOf(UniversalBusinessLanguage::class, $invoice);
+
+        $cii = UBLToCIIInvoice::convert($invoice);
+
+        file_put_contents(__DIR__ . '/Fixtures/CII/BasicWL/' . $filename . '.xml', $cii->toXML()->saveXML());
+
+        $this->assertInstanceOf(CrossIndustryInvoice::class, $cii);
+    }
+
+    public static function provideUBL21FromBasicWLFiles(): array
+    {
+        return [
+            ['CIIBasicWLInvoice'],
+            ['CIIBasicWLInvoice_V7_01'],
+            ['CIIBasicWLInvoice_V7_02'],
+            ['CIIBasicWLInvoice_V7_03'],
+            ['CIIBasicWLInvoice_V7_04'],
+            ['CIIBasicWLInvoice_V7_05'],
+            ['CIIBasicWLInvoice_V7_07'],
+            ['CIIBasicWLInvoice_V7_08'],
+            ['CIIBasicWLInvoice_V7_09'],
+            ['CIIBasicWLInvoice_V7_10'],
+            ['CIIBasicWLInvoice_V7_11'],
         ];
     }
 }
