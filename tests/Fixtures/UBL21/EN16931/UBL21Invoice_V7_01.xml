@@ -1,0 +1,569 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ubl:Invoice xmlns:ubl="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+             xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+             xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+    <cbc:CustomizationID>urn:cen.eu:en16931:2017</cbc:CustomizationID>
+    <cbc:ProfileID>A1</cbc:ProfileID>
+    <cbc:ID>F20220023</cbc:ID>
+    <cbc:IssueDate>2022-01-31</cbc:IssueDate>
+    <cbc:DueDate>2022-03-02</cbc:DueDate>
+    <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
+    <cbc:Note>#REG#FOURNISSEUR F SARL au capital de 50 000 EUR</cbc:Note>
+    <cbc:Note>#ABL#RCS MAVILLE 123 456 782</cbc:Note>
+    <cbc:Note>#AAI#35 ma rue a moi, code postal Ville Pays – contact@masociete.fr - www.masociete.fr – N° TVA : FR32 123
+        456 789
+    </cbc:Note>
+    <cbc:Note>#PMD#Tout retard de paiement engendre une pénalité exigible à compter de la date d'échéance, calculée sur
+        la base de trois fois le taux d'intérêt légal.
+    </cbc:Note>
+    <cbc:Note>#PMT#Indemnité forfaitaire pour frais de recouvrement en cas de retard de paiement : 40 €.</cbc:Note>
+    <cbc:Note>#AAB#Les réglements reçus avant la date d'échéance ne donneront pas lieu à escompte.</cbc:Note>
+    <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
+    <cbc:AccountingCost>BUYER ACCOUNT REF</cbc:AccountingCost>
+    <cbc:BuyerReference>SERVEXEC</cbc:BuyerReference>
+    <cac:InvoicePeriod>
+        <cbc:DescriptionCode>432</cbc:DescriptionCode>
+    </cac:InvoicePeriod>
+    <cac:OrderReference>
+        <cbc:ID>PO201925478</cbc:ID>
+        <cbc:SalesOrderID>SALES REF 2547</cbc:SalesOrderID>
+    </cac:OrderReference>
+    <cac:BillingReference>
+        <cac:InvoiceDocumentReference>
+            <cbc:ID>F20220003</cbc:ID>
+            <cbc:IssueDate>2022-01-01</cbc:IssueDate>
+        </cac:InvoiceDocumentReference>
+    </cac:BillingReference>
+    <cac:DespatchDocumentReference>
+        <cbc:ID>DESPADV002</cbc:ID>
+    </cac:DespatchDocumentReference>
+    <cac:ReceiptDocumentReference>
+        <cbc:ID>RECEIV-ADV002</cbc:ID>
+    </cac:ReceiptDocumentReference>
+    <cac:OriginatorDocumentReference>
+        <cbc:ID>TENDER-002</cbc:ID>
+    </cac:OriginatorDocumentReference>
+    <cac:ContractDocumentReference>
+        <cbc:ID>CT2018120802</cbc:ID>
+    </cac:ContractDocumentReference>
+    <cac:AdditionalDocumentReference>
+        <cbc:ID>SUPPort doc</cbc:ID>
+        <cbc:DocumentDescription>support descript</cbc:DocumentDescription>
+        <cac:Attachment>
+            <cac:ExternalReference>
+                <cbc:URI>url:gffter</cbc:URI>
+            </cac:ExternalReference>
+        </cac:Attachment>
+    </cac:AdditionalDocumentReference>
+    <cac:AdditionalDocumentReference>
+        <cbc:ID schemeID="IT">REFCLI0215</cbc:ID>
+        <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+    </cac:AdditionalDocumentReference>
+    <cac:ProjectReference>
+        <cbc:ID>PROJET2547</cbc:ID>
+    </cac:ProjectReference>
+    <cac:AccountingSupplierParty>
+        <cac:Party>
+            <cbc:EndpointID schemeID="EM">moi@seller.com</cbc:EndpointID>
+            <cac:PartyIdentification>
+                <cbc:ID>123</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PartyIdentification>
+                <cbc:ID schemeID="0088">587451236587</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PartyIdentification>
+                <cbc:ID schemeID="0009">12345678200077</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PartyIdentification>
+                <cbc:ID schemeID="0060">DUNS1235487</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PartyIdentification>
+                <cbc:ID schemeID="0177">ODETTE254879</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PartyIdentification>
+                <cbc:ID schemeID="SEPA">CREDID</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PartyName>
+                <cbc:Name>SELLER TRADE NAME</cbc:Name>
+            </cac:PartyName>
+            <cac:PostalAddress>
+                <cbc:StreetName>35 rue d'ici</cbc:StreetName>
+                <cbc:AdditionalStreetName>Seller line 2</cbc:AdditionalStreetName>
+                <cbc:CityName>PARIS</cbc:CityName>
+                <cbc:PostalZone>75018</cbc:PostalZone>
+                <cac:AddressLine>
+                    <cbc:Line>Seller line 3</cbc:Line>
+                </cac:AddressLine>
+                <cac:Country>
+                    <cbc:IdentificationCode>FR</cbc:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyTaxScheme>
+                <cbc:CompanyID>FR11123456782</cbc:CompanyID>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:PartyTaxScheme>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>LE FOURNISSEUR</cbc:RegistrationName>
+                <cbc:CompanyID schemeID="0002">123456782</cbc:CompanyID>
+                <cbc:CompanyLegalForm>SARL AU CAPITAL DE 50 000 EUROS</cbc:CompanyLegalForm>
+            </cac:PartyLegalEntity>
+            <cac:Contact>
+                <cbc:Name>M. CONTACT</cbc:Name>
+                <cbc:Telephone>01 02 03 54 87</cbc:Telephone>
+                <cbc:ElectronicMail>seller@seller.com</cbc:ElectronicMail>
+            </cac:Contact>
+        </cac:Party>
+    </cac:AccountingSupplierParty>
+    <cac:AccountingCustomerParty>
+        <cac:Party>
+            <cbc:EndpointID schemeID="EM">me@buyer.com</cbc:EndpointID>
+            <cac:PartyIdentification>
+                <cbc:ID schemeID="0088">3654789851</cbc:ID>
+            </cac:PartyIdentification>
+            <cac:PostalAddress>
+                <cbc:StreetName>MON ADRESSE LIGNE 1</cbc:StreetName>
+                <cbc:AdditionalStreetName>Buyer line 2</cbc:AdditionalStreetName>
+                <cbc:CityName>MA VILLE</cbc:CityName>
+                <cbc:PostalZone>06000</cbc:PostalZone>
+                <cac:AddressLine>
+                    <cbc:Line>Buyer line 3</cbc:Line>
+                </cac:AddressLine>
+                <cac:Country>
+                    <cbc:IdentificationCode>FR</cbc:IdentificationCode>
+                </cac:Country>
+            </cac:PostalAddress>
+            <cac:PartyTaxScheme>
+                <cbc:CompanyID>FR 05 987 654 321</cbc:CompanyID>
+                <cac:TaxScheme>
+                    <cbc:ID>VA</cbc:ID>
+                </cac:TaxScheme>
+            </cac:PartyTaxScheme>
+            <cac:PartyLegalEntity>
+                <cbc:RegistrationName>LE CLIENT</cbc:RegistrationName>
+            </cac:PartyLegalEntity>
+            <cac:Contact>
+                <cbc:Name>Buyer contact name</cbc:Name>
+                <cbc:Telephone>01 01 25 45 87</cbc:Telephone>
+                <cbc:ElectronicMail>buyer@buyer.com</cbc:ElectronicMail>
+            </cac:Contact>
+        </cac:Party>
+    </cac:AccountingCustomerParty>
+    <cac:PayeeParty>
+        <cac:PartyIdentification>
+            <cbc:ID schemeID="0088">587451236586</cbc:ID>
+        </cac:PartyIdentification>
+        <cac:PartyIdentification>
+            <cbc:ID schemeID="SEPA">CREDID</cbc:ID>
+        </cac:PartyIdentification>
+        <cac:PartyName>
+            <cbc:Name>PAYEE NAME</cbc:Name>
+        </cac:PartyName>
+        <cac:PartyLegalEntity>
+            <cbc:CompanyID schemeID="0002">303656847</cbc:CompanyID>
+        </cac:PartyLegalEntity>
+    </cac:PayeeParty>
+    <cac:TaxRepresentativeParty>
+        <cac:PartyName>
+            <cbc:Name>SELLER TAX REP</cbc:Name>
+        </cac:PartyName>
+        <cac:PostalAddress>
+            <cbc:StreetName>35 rue d'ici</cbc:StreetName>
+            <cbc:AdditionalStreetName>Seller line 2</cbc:AdditionalStreetName>
+            <cbc:CityName>PARIS</cbc:CityName>
+            <cbc:PostalZone>75018</cbc:PostalZone>
+            <cac:AddressLine>
+                <cbc:Line>Seller line 3</cbc:Line>
+            </cac:AddressLine>
+            <cac:Country>
+                <cbc:IdentificationCode>FR</cbc:IdentificationCode>
+            </cac:Country>
+        </cac:PostalAddress>
+        <cac:PartyTaxScheme>
+            <cbc:CompanyID>FR 05 987 654 321</cbc:CompanyID>
+            <cac:TaxScheme>
+                <cbc:ID>VA</cbc:ID>
+            </cac:TaxScheme>
+        </cac:PartyTaxScheme>
+    </cac:TaxRepresentativeParty>
+    <cac:Delivery>
+        <cbc:ActualDeliveryDate>2022-01-28</cbc:ActualDeliveryDate>
+        <cac:DeliveryLocation>
+            <cbc:ID>PRIVATE_ID_DEL</cbc:ID>
+            <cac:Address>
+                <cbc:StreetName>DEL ADRESSE LIGNE 1</cbc:StreetName>
+                <cbc:AdditionalStreetName>DEL line 2</cbc:AdditionalStreetName>
+                <cbc:CityName>NICE</cbc:CityName>
+                <cbc:PostalZone>06000</cbc:PostalZone>
+                <cac:Country>
+                    <cbc:IdentificationCode>FR</cbc:IdentificationCode>
+                </cac:Country>
+            </cac:Address>
+        </cac:DeliveryLocation>
+        <cac:DeliveryParty>
+            <cac:PartyName>
+                <cbc:Name>DEL Name</cbc:Name>
+            </cac:PartyName>
+        </cac:DeliveryParty>
+    </cac:Delivery>
+    <cac:PaymentMeans>
+        <cbc:PaymentMeansCode name="Virement">30</cbc:PaymentMeansCode>
+        <cbc:PaymentID>F20180023BUYER</cbc:PaymentID>
+        <cac:PayeeFinancialAccount>
+            <cbc:ID>LOC BANK ACCOUNT</cbc:ID>
+            <cbc:Name>MON COMPTE BANCAIRE</cbc:Name>
+            <cac:FinancialInstitutionBranch>
+                <cbc:ID>BIC_MONCOMPTE</cbc:ID>
+            </cac:FinancialInstitutionBranch>
+        </cac:PayeeFinancialAccount>
+        <cac:PaymentMandate>
+            <cbc:ID>MANDATE PT</cbc:ID>
+            <cac:PayerFinancialAccount>
+                <cbc:ID>FRDEBIT</cbc:ID>
+            </cac:PayerFinancialAccount>
+        </cac:PaymentMandate>
+    </cac:PaymentMeans>
+    <cac:PaymentTerms>
+        <cbc:Note>PAIEMENT 30 JOURS NET</cbc:Note>
+    </cac:PaymentTerms>
+    <cac:AllowanceCharge>
+        <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+        <cbc:AllowanceChargeReasonCode>FC</cbc:AllowanceChargeReasonCode>
+        <cbc:AllowanceChargeReason>FRAIS DEPLACEMENT</cbc:AllowanceChargeReason>
+        <cbc:MultiplierFactorNumeric>10.00</cbc:MultiplierFactorNumeric>
+        <cbc:Amount currencyID="EUR">10.00</cbc:Amount>
+        <cbc:BaseAmount currencyID="EUR">100.00</cbc:BaseAmount>
+        <cac:TaxCategory>
+            <cbc:ID>S</cbc:ID>
+            <cbc:Percent>20.00</cbc:Percent>
+            <cac:TaxScheme>
+                <cbc:ID>VAT</cbc:ID>
+            </cac:TaxScheme>
+        </cac:TaxCategory>
+    </cac:AllowanceCharge>
+    <cac:AllowanceCharge>
+        <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+        <cbc:AllowanceChargeReasonCode>ADR</cbc:AllowanceChargeReasonCode>
+        <cbc:AllowanceChargeReason>FRAIS DEPLACEMENT</cbc:AllowanceChargeReason>
+        <cbc:MultiplierFactorNumeric>1.00</cbc:MultiplierFactorNumeric>
+        <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        <cbc:BaseAmount currencyID="EUR">100.00</cbc:BaseAmount>
+        <cac:TaxCategory>
+            <cbc:ID>S</cbc:ID>
+            <cbc:Percent>20.00</cbc:Percent>
+            <cac:TaxScheme>
+                <cbc:ID>VAT</cbc:ID>
+            </cac:TaxScheme>
+        </cac:TaxCategory>
+    </cac:AllowanceCharge>
+    <cac:AllowanceCharge>
+        <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+        <cbc:AllowanceChargeReasonCode>FC</cbc:AllowanceChargeReasonCode>
+        <cbc:AllowanceChargeReason>FRAIS DEPLACEMENT</cbc:AllowanceChargeReason>
+        <cbc:MultiplierFactorNumeric>2.00</cbc:MultiplierFactorNumeric>
+        <cbc:Amount currencyID="EUR">2.00</cbc:Amount>
+        <cbc:BaseAmount currencyID="EUR">100.00</cbc:BaseAmount>
+        <cac:TaxCategory>
+            <cbc:ID>K</cbc:ID>
+            <cbc:Percent>0.00</cbc:Percent>
+            <cac:TaxScheme>
+                <cbc:ID>VAT</cbc:ID>
+            </cac:TaxScheme>
+        </cac:TaxCategory>
+    </cac:AllowanceCharge>
+    <cac:AllowanceCharge>
+        <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+        <cbc:AllowanceChargeReasonCode>FC</cbc:AllowanceChargeReasonCode>
+        <cbc:AllowanceChargeReason>FRAIS DEPLACEMENT</cbc:AllowanceChargeReason>
+        <cbc:MultiplierFactorNumeric>1.00</cbc:MultiplierFactorNumeric>
+        <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        <cbc:BaseAmount currencyID="EUR">100.00</cbc:BaseAmount>
+        <cac:TaxCategory>
+            <cbc:ID>S</cbc:ID>
+            <cbc:Percent>10.00</cbc:Percent>
+            <cac:TaxScheme>
+                <cbc:ID>VAT</cbc:ID>
+            </cac:TaxScheme>
+        </cac:TaxCategory>
+    </cac:AllowanceCharge>
+    <cac:TaxTotal>
+        <cbc:TaxAmount currencyID="EUR">4.90</cbc:TaxAmount>
+        <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="EUR">11.00</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">2.20</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>20.00</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+        <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="EUR">60.00</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">0.00</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID>E</cbc:ID>
+                <cbc:Percent>0.00</cbc:Percent>
+                <cbc:TaxExemptionReasonCode>VATEX-EU-79-C</cbc:TaxExemptionReasonCode>
+                <cbc:TaxExemptionReason>DEBOURS</cbc:TaxExemptionReason>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+        <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="EUR">27.00</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">2.70</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>10.00</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+        <cac:TaxSubtotal>
+            <cbc:TaxableAmount currencyID="EUR">2.00</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">0.00</cbc:TaxAmount>
+            <cac:TaxCategory>
+                <cbc:ID>K</cbc:ID>
+                <cbc:Percent>0.00</cbc:Percent>
+                <cbc:TaxExemptionReasonCode>VATEX-EU-IC</cbc:TaxExemptionReasonCode>
+                <cbc:TaxExemptionReason>LIVRAISON INTRACOMMUNAUTAIRE</cbc:TaxExemptionReason>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:TaxCategory>
+        </cac:TaxSubtotal>
+    </cac:TaxTotal>
+    <cac:LegalMonetaryTotal>
+        <cbc:LineExtensionAmount currencyID="EUR">95.00</cbc:LineExtensionAmount>
+        <cbc:TaxExclusiveAmount currencyID="EUR">100.00</cbc:TaxExclusiveAmount>
+        <cbc:TaxInclusiveAmount currencyID="EUR">104.90</cbc:TaxInclusiveAmount>
+        <cbc:AllowanceTotalAmount currencyID="EUR">9.00</cbc:AllowanceTotalAmount>
+        <cbc:ChargeTotalAmount currencyID="EUR">14.00</cbc:ChargeTotalAmount>
+        <cbc:PrepaidAmount currencyID="EUR">0.00</cbc:PrepaidAmount>
+        <cbc:PayableRoundingAmount currencyID="EUR">0.00</cbc:PayableRoundingAmount>
+        <cbc:PayableAmount currencyID="EUR">104.90</cbc:PayableAmount>
+    </cac:LegalMonetaryTotal>
+    <cac:InvoiceLine>
+        <cbc:ID>1</cbc:ID>
+        <cbc:InvoicedQuantity unitCode="C62">1.0000</cbc:InvoicedQuantity>
+        <cbc:LineExtensionAmount currencyID="EUR">60.00</cbc:LineExtensionAmount>
+        <cbc:AccountingCost>BUY_ACC_REF</cbc:AccountingCost>
+        <cac:InvoicePeriod>
+            <cbc:StartDate>2022-01-01</cbc:StartDate>
+            <cbc:EndDate>2022-01-31</cbc:EndDate>
+        </cac:InvoicePeriod>
+        <cac:OrderLineReference>
+            <cbc:LineID>1</cbc:LineID>
+        </cac:OrderLineReference>
+        <cac:DocumentReference>
+            <cbc:ID>EQUIPE_A</cbc:ID>
+            <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+        </cac:DocumentReference>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReasonCode>71</cbc:AllowanceChargeReasonCode>
+            <cbc:AllowanceChargeReason>REMISE VOLUME</cbc:AllowanceChargeReason>
+            <cbc:MultiplierFactorNumeric>1.00</cbc:MultiplierFactorNumeric>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+            <cbc:BaseAmount currencyID="EUR">100.00</cbc:BaseAmount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReasonCode>71</cbc:AllowanceChargeReasonCode>
+            <cbc:AllowanceChargeReason>REMISE VOLUME</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReasonCode>71</cbc:AllowanceChargeReasonCode>
+            <cbc:AllowanceChargeReason>REMISE VOLUME</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReasonCode>100</cbc:AllowanceChargeReasonCode>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReason>FRAIS PALETTE</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReason>FRAIS PALETTE</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReason>FRAIS PALETTE</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReason>FRAIS PALETTE</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:Item>
+            <cbc:Name>PRESTATION SUPPORT</cbc:Name>
+            <cac:BuyersItemIdentification>
+                <cbc:ID>REF5487</cbc:ID>
+            </cac:BuyersItemIdentification>
+            <cac:SellersItemIdentification>
+                <cbc:ID>ART_1254</cbc:ID>
+            </cac:SellersItemIdentification>
+            <cac:StandardItemIdentification>
+                <cbc:ID schemeID="0160">598785412598745</cbc:ID>
+            </cac:StandardItemIdentification>
+            <cac:CommodityClassification>
+                <cbc:ItemClassificationCode listID="SK">SKU2578</cbc:ItemClassificationCode>
+            </cac:CommodityClassification>
+            <cac:ClassifiedTaxCategory>
+                <cbc:ID>E</cbc:ID>
+                <cbc:Percent>0.00</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+            <cac:AdditionalItemProperty>
+                <cbc:Name>JOUR 8H-20H</cbc:Name>
+                <cbc:Value>CATEGORIE</cbc:Value>
+            </cac:AdditionalItemProperty>
+        </cac:Item>
+        <cac:Price>
+            <cbc:PriceAmount currencyID="EUR">60.00</cbc:PriceAmount>
+            <cbc:BaseQuantity unitCode="C62">1.0000</cbc:BaseQuantity>
+            <cac:AllowanceCharge>
+                <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+                <cbc:Amount currencyID="EUR">5.00</cbc:Amount>
+                <cbc:BaseAmount currencyID="EUR">65.00</cbc:BaseAmount>
+            </cac:AllowanceCharge>
+        </cac:Price>
+    </cac:InvoiceLine>
+    <cac:InvoiceLine>
+        <cbc:ID>2</cbc:ID>
+        <cbc:InvoicedQuantity unitCode="C62">3.0000</cbc:InvoicedQuantity>
+        <cbc:LineExtensionAmount currencyID="EUR">28.00</cbc:LineExtensionAmount>
+        <cbc:AccountingCost>BUY_ACC_REF</cbc:AccountingCost>
+        <cac:InvoicePeriod>
+            <cbc:StartDate>2022-01-01</cbc:StartDate>
+            <cbc:EndDate>2022-01-31</cbc:EndDate>
+        </cac:InvoicePeriod>
+        <cac:OrderLineReference>
+            <cbc:LineID>3</cbc:LineID>
+        </cac:OrderLineReference>
+        <cac:DocumentReference>
+            <cbc:ID>TARIF_2022</cbc:ID>
+            <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
+        </cac:DocumentReference>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReasonCode>71</cbc:AllowanceChargeReasonCode>
+            <cbc:AllowanceChargeReason>REMISE VOLUME</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">2.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReasonCode>71</cbc:AllowanceChargeReasonCode>
+            <cbc:AllowanceChargeReason>REMISE VOLUME</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReasonCode>71</cbc:AllowanceChargeReasonCode>
+            <cbc:AllowanceChargeReason>REMISE VOLUME</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReasonCode>100</cbc:AllowanceChargeReasonCode>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReasonCode>ADL</cbc:AllowanceChargeReasonCode>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReason>FRAIS PALETTE</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:AllowanceCharge>
+            <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+            <cbc:AllowanceChargeReason>FRAIS PALETTE</cbc:AllowanceChargeReason>
+            <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+        </cac:AllowanceCharge>
+        <cac:Item>
+            <cbc:Name>FOURNITURES PAPIER</cbc:Name>
+            <cac:BuyersItemIdentification>
+                <cbc:ID>REF9854</cbc:ID>
+            </cac:BuyersItemIdentification>
+            <cac:SellersItemIdentification>
+                <cbc:ID>ART_9874</cbc:ID>
+            </cac:SellersItemIdentification>
+            <cac:OriginCountry>
+                <cbc:IdentificationCode>FR</cbc:IdentificationCode>
+            </cac:OriginCountry>
+            <cac:CommodityClassification>
+                <cbc:ItemClassificationCode listID="BB">LOT6254784</cbc:ItemClassificationCode>
+            </cac:CommodityClassification>
+            <cac:ClassifiedTaxCategory>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>10.00</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+            <cac:AdditionalItemProperty>
+                <cbc:Name>BLANC</cbc:Name>
+                <cbc:Value>COULEUR</cbc:Value>
+            </cac:AdditionalItemProperty>
+            <cac:AdditionalItemProperty>
+                <cbc:Name>80g</cbc:Name>
+                <cbc:Value>GRAMMAGE</cbc:Value>
+            </cac:AdditionalItemProperty>
+        </cac:Item>
+        <cac:Price>
+            <cbc:PriceAmount currencyID="EUR">30.00</cbc:PriceAmount>
+            <cbc:BaseQuantity unitCode="C62">3.0000</cbc:BaseQuantity>
+            <cac:AllowanceCharge>
+                <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+                <cbc:Amount currencyID="EUR">1.00</cbc:Amount>
+                <cbc:BaseAmount currencyID="EUR">31.00</cbc:BaseAmount>
+            </cac:AllowanceCharge>
+        </cac:Price>
+    </cac:InvoiceLine>
+    <cac:InvoiceLine>
+        <cbc:ID>3</cbc:ID>
+        <cbc:InvoicedQuantity unitCode="C62">1.0000</cbc:InvoicedQuantity>
+        <cbc:LineExtensionAmount currencyID="EUR">7.00</cbc:LineExtensionAmount>
+        <cbc:AccountingCost>BUY_ACC_REF</cbc:AccountingCost>
+        <cac:OrderLineReference>
+            <cbc:LineID>2</cbc:LineID>
+        </cac:OrderLineReference>
+        <cac:Item>
+            <cbc:Name>APPEL</cbc:Name>
+            <cac:ClassifiedTaxCategory>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>20.00</cbc:Percent>
+                <cac:TaxScheme>
+                    <cbc:ID>VAT</cbc:ID>
+                </cac:TaxScheme>
+            </cac:ClassifiedTaxCategory>
+        </cac:Item>
+        <cac:Price>
+            <cbc:PriceAmount currencyID="EUR">7.00</cbc:PriceAmount>
+            <cac:AllowanceCharge>
+                <cbc:ChargeIndicator>false</cbc:ChargeIndicator>
+                <cbc:Amount currencyID="EUR">0.00</cbc:Amount>
+                <cbc:BaseAmount currencyID="EUR">7.00</cbc:BaseAmount>
+            </cac:AllowanceCharge>
+        </cac:Price>
+    </cac:InvoiceLine>
+</ubl:Invoice>
