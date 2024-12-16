@@ -9,6 +9,8 @@ use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Tiime\CrossIndustryInvoice\BasicWL\CrossIndustryInvoice;
 use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\UniversalBusinessLanguage;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\UniversalBusinessLanguage as CreditNoteUBL;
+use Tiime\UniversalBusinessLanguageCrossIndustryInvoiceConversion\UBLToCIICreditNote;
 use Tiime\UniversalBusinessLanguageCrossIndustryInvoiceConversion\UBLToCIIInvoice;
 
 class UBL21Test extends TestCase
@@ -82,6 +84,32 @@ class UBL21Test extends TestCase
             ['CIIBasicWLInvoice_V7_09'],
             ['CIIBasicWLInvoice_V7_10'],
             ['CIIBasicWLInvoice_V7_11'],
+        ];
+    }
+
+    #[TestDox('Create CII BasicWL Invoices from UBL 2.1')]
+    #[DataProvider('provideUBL21FromBasicEN16931CreditNoteFiles')]
+    public function testCreditNoteCreateCIIFromUBL21GeneratedByEN16931(string $filename): void
+    {
+        $document = new \DOMDocument();
+        $content  = file_get_contents(__DIR__ . '/Fixtures/UBL21/EN16931/' . $filename . '.xml');
+        $document->loadXML($content);
+
+        $invoice = CreditNoteUBL::fromXML($document);
+
+        $this->assertInstanceOf(CreditNoteUBL::class, $invoice);
+
+        $cii = UBLToCIICreditNote::convert($invoice);
+
+        file_put_contents(__DIR__ . '/Fixtures/CII/BasicWL/' . $filename . '.xml', $cii->toXML()->saveXML());
+
+        $this->assertInstanceOf(CrossIndustryInvoice::class, $cii);
+    }
+
+    public static function provideUBL21FromBasicEN16931CreditNoteFiles(): array
+    {
+        return [
+            ['UBL21CreditNote_V7_06'],
         ];
     }
 }

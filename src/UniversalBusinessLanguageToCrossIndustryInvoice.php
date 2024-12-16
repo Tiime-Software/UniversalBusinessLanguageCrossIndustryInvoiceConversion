@@ -10,7 +10,7 @@ class UniversalBusinessLanguageToCrossIndustryInvoice
 {
     public static function convert(UniversalBusinessLanguageInterface $invoice): BasicWLCrossIndustryInvoice
     {
-        if (InvoiceTypeCodeUNTDID1001Helper::isInvoice($invoice->getInvoiceTypeCode())) {
+        if ($invoice->getInvoiceTypeCode() && InvoiceTypeCodeUNTDID1001Helper::isInvoice($invoice->getInvoiceTypeCode())) {
             return UBLToCIIInvoice::convert($invoice);
         }
 

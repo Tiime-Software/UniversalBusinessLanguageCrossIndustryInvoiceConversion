@@ -394,7 +394,10 @@ class UBLToCIIInvoice
             ->setSpecifiedTradePaymentTerms( // BT-20-00
                 (new SpecifiedTradePaymentTerms())
                     ->setDescription($invoice->getPaymentTerms()?->getNote()) // BT-20
-                    ->setDueDateDateTime(new DueDateDateTime($invoice->getDueDate()->getDateTimeString())) // BT-9-00
+                    ->setDueDateDateTime( // BT-9-00
+                        null === $invoice->getDueDate() ? null :
+                        new DueDateDateTime($invoice->getDueDate()->getDateTimeString())
+                    )
                     ->setDirectDebitMandateIdentifier( // BT-89
                         null === $invoice->getPaymentMeans()[0]?->getPaymentMandate() ? null :
                         $invoice->getPaymentMeans()[0]->getPaymentMandate()->getIdentifier()
