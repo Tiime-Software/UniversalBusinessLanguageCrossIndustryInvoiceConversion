@@ -2,73 +2,120 @@
 
 namespace Tiime\UniversalBusinessLanguageCrossIndustryInvoiceConversion;
 
-use Tiime\CrossIndustryInvoice\BasicWL\CrossIndustryInvoice as BasicWLCrossIndustryInvoice;
 use Tiime\CrossIndustryInvoice\DataType\ActualDeliverySupplyChainEvent;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeAgreement;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeDelivery;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeSettlement;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\BuyerTradeParty;
+use Tiime\CrossIndustryInvoice\DataType\AdditionalReferencedDocumentAdditionalSupportingDocument;
+use Tiime\CrossIndustryInvoice\DataType\AdditionalReferencedDocumentInvoicedObjectIdentifier;
+use Tiime\CrossIndustryInvoice\DataType\AdditionalReferencedDocumentInvoiceLineObjectIdentifier;
+use Tiime\CrossIndustryInvoice\DataType\AdditionalReferencedDocumentTenderOrLotReference;
+use Tiime\CrossIndustryInvoice\DataType\ApplicableProductCharacteristic;
+use Tiime\CrossIndustryInvoice\DataType\ApplicableTradeSettlementFinancialCard;
+use Tiime\CrossIndustryInvoice\DataType\AssociatedDocumentLineDocument;
+use Tiime\CrossIndustryInvoice\DataType\Basic\ApplicableTradeTax;
+use Tiime\CrossIndustryInvoice\DataType\Basic\AppliedTradeAllowanceCharge;
+use Tiime\CrossIndustryInvoice\DataType\Basic\BasisQuantity;
+use Tiime\CrossIndustryInvoice\DataType\Basic\BilledQuantity;
+use Tiime\CrossIndustryInvoice\DataType\Basic\GrossPriceProductTradePrice;
+use Tiime\CrossIndustryInvoice\DataType\Basic\SpecifiedLineTradeDelivery;
+use Tiime\CrossIndustryInvoice\DataType\Basic\SpecifiedTradeSettlementLineMonetarySummation;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ExchangedDocument;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\HeaderApplicableTradeTax;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\PayeePartyCreditorFinancialAccount;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PayeeSpecifiedLegalOrganization;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\PostalTradeAddress;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerSpecifiedLegalOrganization;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\SellerTradeParty;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\SpecifiedTradeSettlementHeaderMonetarySummation;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\SpecifiedTradeSettlementPaymentMeans;
-use Tiime\CrossIndustryInvoice\DataType\BasicWL\SupplyChainTradeTransaction;
 use Tiime\CrossIndustryInvoice\DataType\BillingSpecifiedPeriod;
 use Tiime\CrossIndustryInvoice\DataType\BusinessProcessSpecifiedDocumentContextParameter;
 use Tiime\CrossIndustryInvoice\DataType\BuyerGlobalIdentifier;
 use Tiime\CrossIndustryInvoice\DataType\BuyerOrderReferencedDocument;
 use Tiime\CrossIndustryInvoice\DataType\CategoryTradeTax;
+use Tiime\CrossIndustryInvoice\DataType\ClassCode;
 use Tiime\CrossIndustryInvoice\DataType\ContractReferencedDocument;
+use Tiime\CrossIndustryInvoice\DataType\DefinedTradeContact;
+use Tiime\CrossIndustryInvoice\DataType\DesignatedProductClassification;
 use Tiime\CrossIndustryInvoice\DataType\DespatchAdviceReferencedDocument;
 use Tiime\CrossIndustryInvoice\DataType\DocumentIncludedNote;
 use Tiime\CrossIndustryInvoice\DataType\DueDateDateTime;
+use Tiime\CrossIndustryInvoice\DataType\EmailURIUniversalCommunication;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\ApplicableHeaderTradeAgreement;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\ApplicableHeaderTradeDelivery;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\ApplicableHeaderTradeSettlement;
 use Tiime\CrossIndustryInvoice\DataType\EN16931\BuyerSpecifiedLegalOrganization;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\BuyerTradeParty;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\HeaderApplicableTradeTax;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\IncludedSupplyChainTradeLineItem;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\LineSpecifiedTradeAllowance;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\LineSpecifiedTradeCharge;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\PayeePartyCreditorFinancialAccount;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\SellerTradeParty;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\SpecifiedLineTradeAgreement;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\SpecifiedLineTradeSettlement;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\SpecifiedTradeProduct;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\SpecifiedTradeSettlementHeaderMonetarySummation;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\SpecifiedTradeSettlementPaymentMeans;
+use Tiime\CrossIndustryInvoice\DataType\EN16931\SupplyChainTradeTransaction;
 use Tiime\CrossIndustryInvoice\DataType\EndDateTime;
 use Tiime\CrossIndustryInvoice\DataType\ExchangedDocumentContext;
 use Tiime\CrossIndustryInvoice\DataType\FormattedIssueDateTime;
 use Tiime\CrossIndustryInvoice\DataType\GuidelineSpecifiedDocumentContextParameter;
 use Tiime\CrossIndustryInvoice\DataType\InvoiceReferencedDocument;
 use Tiime\CrossIndustryInvoice\DataType\IssueDateTime;
+use Tiime\CrossIndustryInvoice\DataType\LineBuyerOrderReferencedDocument;
+use Tiime\CrossIndustryInvoice\DataType\LineIncludedNote;
 use Tiime\CrossIndustryInvoice\DataType\LocationGlobalIdentifier;
+use Tiime\CrossIndustryInvoice\DataType\NetPriceProductTradePrice;
 use Tiime\CrossIndustryInvoice\DataType\OccurrenceDateTime;
+use Tiime\CrossIndustryInvoice\DataType\OriginTradeCountry;
 use Tiime\CrossIndustryInvoice\DataType\PayeeGlobalIdentifier;
+use Tiime\CrossIndustryInvoice\DataType\PayeeSpecifiedCreditorFinancialInstitution;
 use Tiime\CrossIndustryInvoice\DataType\PayeeTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\PayerPartyDebtorFinancialAccount;
 use Tiime\CrossIndustryInvoice\DataType\ReceivableSpecifiedTradeAccountingAccount;
+use Tiime\CrossIndustryInvoice\DataType\ReceivingAdviceReferencedDocument;
 use Tiime\CrossIndustryInvoice\DataType\SellerGlobalIdentifier;
+use Tiime\CrossIndustryInvoice\DataType\SellerOrderReferencedDocument;
 use Tiime\CrossIndustryInvoice\DataType\SellerTaxRepresentativeTradeParty;
 use Tiime\CrossIndustryInvoice\DataType\ShipToTradeParty;
+use Tiime\CrossIndustryInvoice\DataType\SpecifiedProcuringProject;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTaxRegistrationVA;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradeAllowance;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradeCharge;
 use Tiime\CrossIndustryInvoice\DataType\SpecifiedTradePaymentTerms;
 use Tiime\CrossIndustryInvoice\DataType\StartDateTime;
 use Tiime\CrossIndustryInvoice\DataType\TaxTotalAmount;
+use Tiime\CrossIndustryInvoice\DataType\TelephoneUniversalCommunication;
 use Tiime\CrossIndustryInvoice\DataType\URIUniversalCommunication;
+use Tiime\CrossIndustryInvoice\EN16931\CrossIndustryInvoice;
 use Tiime\EN16931\Codelist\InvoiceTypeCodeUNTDID1001;
 use Tiime\EN16931\Converter\TimeReferencingCodeUNTDID2005ToTimeReferencingCodeUNTDID2475;
 use Tiime\EN16931\DataType\Identifier\BankAssignedCreditorIdentifier;
+use Tiime\EN16931\DataType\Identifier\BuyerItemIdentifier;
 use Tiime\EN16931\DataType\Identifier\ElectronicAddressIdentifier;
+use Tiime\EN16931\DataType\Identifier\ObjectIdentifier;
+use Tiime\EN16931\DataType\Identifier\SellerItemIdentifier;
 use Tiime\EN16931\DataType\Identifier\SpecificationIdentifier;
+use Tiime\EN16931\DataType\Identifier\StandardItemIdentifier;
 use Tiime\EN16931\DataType\Reference\ContractReference;
 use Tiime\EN16931\DataType\Reference\DespatchAdviceReference;
 use Tiime\EN16931\DataType\Reference\PrecedingInvoiceReference;
-use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\Allowance;
-use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\PaymentMeans;
-use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\SellerPartyIdentification;
-use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\DataType\Aggregate\TaxSubtotal;
-use Tiime\UniversalBusinessLanguage\Ubl21\Invoice\UniversalBusinessLanguage;
+use Tiime\EN16931\DataType\Reference\ProjectReference;
+use Tiime\EN16931\DataType\Reference\ReceivingAdviceReference;
+use Tiime\EN16931\DataType\Reference\SupportingDocumentReference;
+use Tiime\EN16931\DataType\Reference\TenderOrLotReference;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\AdditionalDocumentReference;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\AdditionalItemProperty;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\Allowance;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\CommodityClassification;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\CreditNoteLine;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\InvoiceLineAllowance;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\InvoiceLineCharge;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\PaymentMeans;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\SellerPartyIdentification;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\DataType\Aggregate\TaxSubtotal;
+use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\UniversalBusinessLanguage;
 
-class UBLToCIIInvoice
+class UBLToCIIEN16931CreditNote
 {
-    public static function convert(UniversalBusinessLanguage $invoice): BasicWLCrossIndustryInvoice
+    public static function convert(UniversalBusinessLanguage $invoice): CrossIndustryInvoice
     {
-        return new BasicWLCrossIndustryInvoice(
+        return new CrossIndustryInvoice(
             exchangedDocumentContext: self::getExchangedDocumentContext($invoice), // BG-2
             exchangedDocument: self::getExchangedDocument($invoice), // BT-1-00
             supplyChainTradeTransaction: self::getSupplyChainTradeTransaction($invoice) // BG-25-00
@@ -82,7 +129,7 @@ class UBLToCIIInvoice
     {
         return (new ExchangedDocumentContext(
             guidelineSpecifiedDocumentContextParameter: new GuidelineSpecifiedDocumentContextParameter( // BT-24-00
-                identifier: new SpecificationIdentifier(SpecificationIdentifier::BASICWL)
+                identifier: new SpecificationIdentifier(SpecificationIdentifier::EN16931)
             )
         ))
             ->setBusinessProcessSpecifiedDocumentContextParameter( // BT-23-00
@@ -101,7 +148,7 @@ class UBLToCIIInvoice
     {
         return (new ExchangedDocument(
             identifier: $invoice->getIdentifier(), // BT-1
-            typeCode: InvoiceTypeCodeUNTDID1001::from($invoice->getInvoiceTypeCode()->value), // BT-3
+            typeCode: InvoiceTypeCodeUNTDID1001::from($invoice->getCreditNoteTypeCode()->value), // BT-3
             issueDateTime: new IssueDateTime($invoice->getIssueDate()->getDateTimeString()) // BT-2-00
         ))
             ->setIncludedNotes( // BG-1
@@ -123,7 +170,8 @@ class UBLToCIIInvoice
         return new SupplyChainTradeTransaction(
             applicableHeaderTradeAgreement: self::getApplicableHeaderTradeAgreement($invoice), // BT-10.
             applicableHeaderTradeDelivery: self::getApplicableHeaderTradeDelivery($invoice), // BG-13.
-            applicableHeaderTradeSettlement: self::getApplicableHeaderTradeSettlement($invoice) // BG-19.
+            applicableHeaderTradeSettlement: self::getApplicableHeaderTradeSettlement($invoice), // BG-19.
+            includedSupplyChainTradeLineItems: self::getIncludedSupplyChainTradeLineItems($invoice), // BG-25.
         );
     }
 
@@ -151,6 +199,7 @@ class UBLToCIIInvoice
                         ->setCountrySubDivisionName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountrySubentity()), // BT-68
                     new SpecifiedTaxRegistrationVA($invoice->getTaxRepresentativeParty()->getPartyTaxScheme()->getCompanyIdentifier()) // BT-63-00
                 ))
+            ->setSpecifiedProcuringProject(self::getSpecifiedProcuringProject($invoice)) // BT-11
             ->setContractReferencedDocument( // BT-12
                 null === $invoice->getContractDocumentReference() ? null :
                 new ContractReferencedDocument(
@@ -158,12 +207,39 @@ class UBLToCIIInvoice
                 )
             )
             ->setBuyerReference($invoice->getBuyerReference()) // BT-10
-            ->setBuyerOrderReferencedDocument(// BT-14
+            ->setBuyerOrderReferencedDocument(
                 null === $invoice->getOrderReference() ? null :
                 new BuyerOrderReferencedDocument(
                     $invoice->getOrderReference()->getIdentifier()
                 )
-            )
+            ) // BT-13
+            ->setSellerOrderReferencedDocument(
+                null === $invoice->getOrderReference()?->getSalesOrderIdentifier() ? null :
+                    new SellerOrderReferencedDocument($invoice->getOrderReference()->getSalesOrderIdentifier())
+            ) // BT-14
+            ->setAdditionalReferencedDocuments(
+                array_map(
+                    static fn (AdditionalDocumentReference $additionalDocumentReference) => (new AdditionalReferencedDocumentAdditionalSupportingDocument(
+                        new SupportingDocumentReference($additionalDocumentReference->getIdentifier()->value) // BT-128
+                    ))
+                        ->setName($additionalDocumentReference->getDocumentDescription()) // BT-123
+                        ->setUriIdentifier($additionalDocumentReference->getAttachment()?->getExternalReference()->getUri()) // BT-124
+                        ->setAttachmentBinaryObject(
+                            $additionalDocumentReference->getAttachment()?->getEmbeddedDocumentBinaryObject()
+                        ) // BT-125
+                    ,
+                    array_filter($invoice->getAdditionalDocumentReferences(), fn (AdditionalDocumentReference $additionalDocumentReference) => null === $additionalDocumentReference->getIdentifier()->scheme)
+                )
+            ) // BG-24
+            ->setAdditionalReferencedDocumentInvoicedObjectIdentifier(
+                self::getAdditionalReferencedDocumentInvoicedObjectIdentifier($invoice)
+            ) // BT-18-00
+            ->setAdditionalReferencedDocumentTenderOrLotReference(
+                null === $invoice->getOriginatorDocumentReference() ? null :
+                new AdditionalReferencedDocumentTenderOrLotReference(
+                    new TenderOrLotReference($invoice->getOriginatorDocumentReference()->getIdentifier())
+                )
+            ) // BT-17-00
         ;
     }
 
@@ -215,6 +291,14 @@ class UBLToCIIInvoice
                         $buyerParty->getEndpointIdentifier()->scheme
                     )
                 )
+            )
+            ->setDefinedTradeContact( // BG-9
+                null === $buyerParty->getContact() ? null
+                    : (new DefinedTradeContact())
+                        ->setPersonName($buyerParty->getContact()->getName()) // BT-56
+                        ->setTelephoneUniversalCommunication(new TelephoneUniversalCommunication($buyerParty->getContact()->getTelephone())) // BT-57
+                        ->setEmailURIUniversalCommunication(new EmailURIUniversalCommunication($buyerParty->getContact()->getElectronicMail())) // BT-58
+                        ->setDepartmentName('') // BT-56-00 TODO not in UBL ?
             )
         ;
     }
@@ -274,6 +358,13 @@ class UBLToCIIInvoice
                     )
                 )
             )
+            ->setDefinedTradeContact( // BG-6
+                null === $sellerParty->getContact() ? null
+                    : (new DefinedTradeContact())
+                        ->setPersonName($sellerParty->getContact()->getName()) // BT-41
+                        ->setTelephoneUniversalCommunication(new TelephoneUniversalCommunication($sellerParty->getContact()->getTelephone())) // BT-42
+                        ->setEmailURIUniversalCommunication(new EmailURIUniversalCommunication($sellerParty->getContact()->getElectronicMail())) // BT-43
+            )
         ;
     }
 
@@ -284,16 +375,20 @@ class UBLToCIIInvoice
     {
         return (new ApplicableHeaderTradeDelivery())
             ->setShipToTradeParty(self::getDelivery($invoice)) // BG-13
-            ->setActualDeliverySupplyChainEvent( // BT-72-00
+            ->setActualDeliverySupplyChainEvent(
                 null !== $invoice->getDelivery()?->getActualDeliveryDate()?->getDateTimeString() ?
                 new ActualDeliverySupplyChainEvent(new OccurrenceDateTime($invoice->getDelivery()?->getActualDeliveryDate()?->getDateTimeString()))
                 : null
-            )
-            ->setDespatchAdviceReferencedDocument( // BT-16-00
+            ) // BT-72-00
+            ->setDespatchAdviceReferencedDocument(
                 null !== $invoice->getDespatchDocumentReference() ?
-                new DespatchAdviceReferencedDocument(new DespatchAdviceReference($invoice->getDespatchDocumentReference()?->getIdentifier()))
+                new DespatchAdviceReferencedDocument(new DespatchAdviceReference($invoice->getDespatchDocumentReference()->getIdentifier()))
                 : null
-            )
+            ) // BT-16-00
+            ->setReceivingAdviceReferencedDocument(
+                null === $invoice->getReceiptDocumentReference() ? null :
+                new ReceivingAdviceReferencedDocument(new ReceivingAdviceReference($invoice->getReceiptDocumentReference()->getIdentifier()))
+            ) // BT-15-00
         ;
     }
 
@@ -547,8 +642,246 @@ class UBLToCIIInvoice
                     (new PayeePartyCreditorFinancialAccount())
                         ->setProprietaryIdentifier($paymentMeans->getPayeeFinancialAccount()?->getPaymentAccountIdentifier())
                         ->setIbanIdentifier($paymentMeans->getPayeeFinancialAccount()?->getPaymentAccountIdentifier()) // BT-84
+                )
+                ->setInformation($paymentMeans->getPaymentMeansCode()->getName()) // BT-82
+                ->setApplicableTradeSettlementFinancialCard(
+                    null === $paymentMeans->getCardAccount() ? null :
+                    (
+                        new ApplicableTradeSettlementFinancialCard(
+                            $paymentMeans->getCardAccount()->getPrimaryAccountNumberIdentifier()) // BT-87
+                    )
+                        ->setCardholderName($paymentMeans->getCardAccount()->getHolderName()) // BT-88
+                ) // BG-18
+                ->setPayeeSpecifiedCreditorFinancialInstitution( // BT-86-00
+                    payeeSpecifiedCreditorFinancialInstitution: null === $paymentMeans->getPayeeFinancialAccount()?->getFinancialInstitutionBranch() ? null :
+                    new PayeeSpecifiedCreditorFinancialInstitution($paymentMeans->getPayeeFinancialAccount()->getFinancialInstitutionBranch()->getIdentifier())
                 ),
-            $invoice->getPaymentMeans())
+            $invoice->getPaymentMeans()
+        )
         ;
+    }
+
+    /**
+     * BG-25.
+     *
+     * @return IncludedSupplyChainTradeLineItem[]
+     */
+    private static function getIncludedSupplyChainTradeLineItems(UniversalBusinessLanguage $invoice): array
+    {
+        return array_map(
+            static fn (CreditNoteLine $line) => new IncludedSupplyChainTradeLineItem(
+                associatedDocumentLineDocument: (new AssociatedDocumentLineDocument($line->getInvoiceLineIdentifier()))
+                    ->setIncludedNote(null === $line->getNote() ? null : new LineIncludedNote($line->getNote())), // BT-127-00.
+                specifiedTradeProduct: self::getSpecifiedTradeProduct($line), // BG-31
+                specifiedLineTradeAgreement: self::getSpecifiedLineTradeAgreement($line), // BG-29.
+                specifiedLineTradeDelivery: new SpecifiedLineTradeDelivery(
+                    new BilledQuantity(
+                        quantity: $line->getCreditedQuantity()->getQuantity()->getValue(), // BT-129
+                        unitCode: $line->getCreditedQuantity()->getUnitCode() // BT-130
+                    )
+                ), // BT-129-00.
+                specifiedLineTradeSettlement: self::getSpecifiedLineTradeSettlement($line), // BG-30-00.
+            ),
+            $invoice->getCreditNoteLines()
+        );
+    }
+
+    /**
+     * BG-31.
+     */
+    private static function getSpecifiedTradeProduct(CreditNoteLine $line): SpecifiedTradeProduct
+    {
+        return (new SpecifiedTradeProduct(
+            name: $line->getItem()->getName(), // BT-153
+        ))
+            ->setDescription($line->getItem()->getDescription()) // BT-154
+            ->setSellerAssignedIdentifier(
+                null === $line->getItem()->getSellersItemIdentification() ? null
+                : new SellerItemIdentifier($line->getItem()->getSellersItemIdentification()->getSellersItemIdentifier())
+            ) // BT-155
+            ->setBuyerAssignedIdentifier(
+                null === $line->getItem()->getBuyersItemIdentification() ? null
+                : new BuyerItemIdentifier($line->getItem()->getBuyersItemIdentification()->getBuyersItemIdentifier())
+            ) // BT-156
+            ->setGlobalIdentifier(
+                null === $line->getItem()->getStandardItemIdentification() ? null :
+                    new StandardItemIdentifier(
+                        value: $line->getItem()->getStandardItemIdentification()->getStandardItemIdentifier()->value,
+                        scheme: $line->getItem()->getStandardItemIdentification()->getStandardItemIdentifier()->scheme
+                    )
+            ) // BT-157
+            ->setApplicableProductCharacteristics(
+                array_map(
+                    static fn (AdditionalItemProperty $characteristic) => new ApplicableProductCharacteristic(
+                        description: $characteristic->getValue(), // BT-160
+                        value: $characteristic->getName() // BT-161
+                    ),
+                    $line->getItem()->getAdditionalProperties()
+                )
+            ) // BG-32
+            ->setDesignatedProductClassifications(
+                array_map(
+                    static fn (CommodityClassification $classification) => (new DesignatedProductClassification())
+                        ->setClassCode(
+                            new ClassCode(
+                                value: $classification->getItemClassificationCode(),
+                                listIdentifier: $classification->getListIdentifier()
+                            )
+                        ),
+                    $line->getItem()->getCommodityClassifications()
+                )
+            ) // BG-158-00.
+            ->setOriginTradeCountry(
+                null === $line->getItem()->getOriginCountry() ? null :
+                    new OriginTradeCountry($line->getItem()->getOriginCountry()->getIdentificationCode())
+            ) // BT-159-00
+        ;
+    }
+
+    /**
+     * BG-29.
+     */
+    private static function getSpecifiedLineTradeAgreement(CreditNoteLine $line): SpecifiedLineTradeAgreement
+    {
+        return (new SpecifiedLineTradeAgreement(
+            netPriceProductTradePrice: (new NetPriceProductTradePrice(
+                chargeAmount: $line->getPrice()->getPriceAmount()->getValue()->getValue(), // BT-146.
+            )) // BT-146-00.
+                ->setBasisQuantity(
+                    basisQuantity: null === $line->getPrice()->getBaseQuantity() ? null :
+                    (new BasisQuantity(
+                        value: $line->getPrice()->getBaseQuantity()->getQuantity()->getValue(), // BT-149.
+                    ))
+                        ->setUnitCode($line->getPrice()->getBaseQuantity()->getUnitCode()) // BT-150.
+                )
+        ))
+            ->setGrossPriceProductTradePrice(
+                grossPriceProductTradePrice: null === $line->getPrice()->getAllowance() ? null :
+                (new GrossPriceProductTradePrice(
+                    chargeAmount: $line->getPrice()->getAllowance()->getBaseAmount()->getValue()->getValue(), // BT-147.
+                )) // BT-148-00
+                    ->setBasisQuantity(
+                        basisQuantity: null === $line->getPrice()->getBaseQuantity() ? null :
+                        (new BasisQuantity(
+                            value: $line->getPrice()->getBaseQuantity()->getQuantity()->getValue(), // BT-149-1.
+                        ))
+                            ->setUnitCode($line->getPrice()->getBaseQuantity()->getUnitCode()) // BT-150-1.
+                    )
+                    ->setAppliedTradeAllowanceCharge(
+                        appliedTradeAllowanceCharge: null === $line->getPrice()->getAllowance() ? null :
+                        (new AppliedTradeAllowanceCharge(
+                            actualAmount: $line->getPrice()->getAllowance()->getAmount()->getValue()->getValue(), // BT-147.
+                        ))
+                    )
+            )
+            ->setBuyerOrderReferencedDocument(
+                null === $line->getOrderLineReference() ? null :
+                    (new LineBuyerOrderReferencedDocument())
+                        ->setLineIdentifier($line->getOrderLineReference()->getIdentifier()) // BT-132
+            ) // BT-132-00.
+        ;
+    }
+
+    /**
+     * BG-30-00.
+     */
+    private static function getSpecifiedLineTradeSettlement(CreditNoteLine $line): SpecifiedLineTradeSettlement
+    {
+        return (new SpecifiedLineTradeSettlement(
+            applicableTradeTax: (new ApplicableTradeTax($line->getItem()->getClassifiedTaxCategory()->getVatCategory()))
+                ->setRateApplicablePercent($line->getItem()->getClassifiedTaxCategory()->getPercent()?->getValue()), // BG-30
+            specifiedTradeSettlementLineMonetarySummation: (new SpecifiedTradeSettlementLineMonetarySummation($line->getLineExtensionAmount()->getValue()->getValue())), // BG-131-00.
+        ))
+            ->setBillingSpecifiedPeriod(
+                null === $line->getInvoicePeriod() ? null :
+                (new BillingSpecifiedPeriod())
+                    ->setStartDateTime(
+                        null === $line->getInvoicePeriod()->getStartDate() ? null :
+                        new StartDateTime($line->getInvoicePeriod()->getStartDate()->getDateTimeString())
+                    ) // BT-134
+                    ->setEndDateTime(
+                        null === $line->getInvoicePeriod()->getEndDate() ? null :
+                        new EndDateTime($line->getInvoicePeriod()->getEndDate()->getDateTimeString())
+                    ) // BT-135
+            ) // BG-26
+            ->setSpecifiedTradeAllowances(
+                array_map(
+                    static fn (InvoiceLineAllowance $allowance) => (new LineSpecifiedTradeAllowance(
+                        actualAmount: $allowance->getAmount()->getValue()->getValue(), // BT-136
+                    ))
+                        ->setBasisAmount($allowance->getBaseAmount()?->getValue()->getValue()) // BT-137
+                        ->setCalculationPercent($allowance->getMultiplierFactorNumeric()?->getValue()) // BT-138
+                        ->setReason($allowance->getAllowanceReason()) // BT-139
+                        ->setReasonCode($allowance->getAllowanceReasonCode()), // BT-140
+                    $line->getAllowances()
+                )
+            ) // BG-27
+            ->setSpecifiedTradeCharges(
+                array_map(
+                    static fn (InvoiceLineCharge $charge) => (new LineSpecifiedTradeCharge(
+                        actualAmount: $charge->getAmount()->getValue()->getValue(), // BT-141
+                    ))
+                        ->setBasisAmount($charge->getBaseAmount()?->getValue()->getValue()) // BT-142
+                        ->setCalculationPercent($charge->getMultiplierFactorNumeric()?->getValue()) // BT-143
+                        ->setReason($charge->getChargeReason()) // BT-144
+                        ->setReasonCode($charge->getChargeReasonCode()) // BT-145
+                    , $line->getCharges()
+                )
+            ) // BG-28
+            ->setReceivableSpecifiedTradeAccountingAccount(
+                null === $line->getAccountingCost() ? null :
+                new ReceivableSpecifiedTradeAccountingAccount($line->getAccountingCost())
+            ) // BT-133-00
+            ->setAdditionalReferencedDocument(
+                null === $line->getDocumentReference() ? null :
+                (new AdditionalReferencedDocumentInvoiceLineObjectIdentifier($line->getDocumentReference()->getIdentifier()))
+            ) // BT-128-00
+        ;
+    }
+
+    /**
+     * BT-18-00.
+     */
+    private static function getAdditionalReferencedDocumentInvoicedObjectIdentifier(UniversalBusinessLanguage $invoice): ?AdditionalReferencedDocumentInvoicedObjectIdentifier
+    {
+        $filteredReferences = array_filter(
+            $invoice->getAdditionalDocumentReferences(),
+            fn (AdditionalDocumentReference $additionalDocumentReference) => null !== $additionalDocumentReference->getIdentifier()->scheme
+        );
+        $additionalDocumentReference = reset($filteredReferences);
+
+        if (!$additionalDocumentReference) {
+            return null;
+        }
+
+        return (new AdditionalReferencedDocumentInvoicedObjectIdentifier(
+            new ObjectIdentifier($additionalDocumentReference->getIdentifier()->value)
+        ))
+            ->setReferenceTypeCode($additionalDocumentReference->getIdentifier()->scheme); // BT-18-1
+    }
+
+    /**
+     * BT-11.
+     */
+    private static function getSpecifiedProcuringProject(UniversalBusinessLanguage $invoice): ?SpecifiedProcuringProject
+    {
+        if (null === $invoice->getAdditionalDocumentReferences()) {
+            return null;
+        }
+
+        $projectReference = array_filter(
+            $invoice->getAdditionalDocumentReferences(),
+            fn (AdditionalDocumentReference $additionalDocumentReference) => '50' === $additionalDocumentReference->getDocumentTypeCode()
+        );
+
+        if (!$projectReference) {
+            return null;
+        }
+
+        $projectReference = reset($projectReference);
+
+        return new SpecifiedProcuringProject(
+            new ProjectReference($projectReference->getIdentifier()->value)
+        );
     }
 }

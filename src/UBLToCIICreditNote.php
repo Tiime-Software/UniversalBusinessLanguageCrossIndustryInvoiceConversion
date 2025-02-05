@@ -4,7 +4,6 @@ namespace Tiime\UniversalBusinessLanguageCrossIndustryInvoiceConversion;
 
 use Tiime\CrossIndustryInvoice\BasicWL\CrossIndustryInvoice as BasicWLCrossIndustryInvoice;
 use Tiime\CrossIndustryInvoice\DataType\ActualDeliverySupplyChainEvent;
-use Tiime\CrossIndustryInvoice\DataType\Basic\ApplicableTradeTax;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeAgreement;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeDelivery;
 use Tiime\CrossIndustryInvoice\DataType\BasicWL\ApplicableHeaderTradeSettlement;
@@ -67,12 +66,12 @@ use Tiime\UniversalBusinessLanguage\Ubl21\CreditNote\UniversalBusinessLanguage;
 
 class UBLToCIICreditNote
 {
-    public static function convert(UniversalBusinessLanguage $creditNote): BasicWLCrossIndustryInvoice
+    public static function convert(UniversalBusinessLanguage $invoice): BasicWLCrossIndustryInvoice
     {
         return new BasicWLCrossIndustryInvoice(
-            exchangedDocumentContext: self::getExchangedDocumentContext($creditNote), // BG-2
-            exchangedDocument: self::getExchangedDocument($creditNote), // BT-1-00
-            supplyChainTradeTransaction: self::getSupplyChainTradeTransaction($creditNote) // BG-25-00
+            exchangedDocumentContext: self::getExchangedDocumentContext($invoice), // BG-2
+            exchangedDocument: self::getExchangedDocument($invoice), // BT-1-00
+            supplyChainTradeTransaction: self::getSupplyChainTradeTransaction($invoice) // BG-25-00
         );
     }
 
@@ -88,9 +87,9 @@ class UBLToCIICreditNote
         ))
             ->setBusinessProcessSpecifiedDocumentContextParameter( // BT-23-00
                 null === $invoice->getProfileIdentifier() ? null :
-                    new BusinessProcessSpecifiedDocumentContextParameter(
-                        $invoice->getProfileIdentifier()
-                    )
+                new BusinessProcessSpecifiedDocumentContextParameter(
+                    $invoice->getProfileIdentifier()
+                )
             )
         ;
     }
@@ -139,31 +138,31 @@ class UBLToCIICreditNote
         ))
             ->setSellerTaxRepresentativeTradeParty( // BG-11
                 null === $invoice->getTaxRepresentativeParty() ? null :
-                    new SellerTaxRepresentativeTradeParty(
-                        $invoice->getTaxRepresentativeParty()?->getPartyName()->getName(), // BT-62
-                        (new PostalTradeAddress( // BG-12
-                            $invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountry()->getIdentificationCode()) // BT-69
-                        )
-                            ->setLineOne($invoice->getTaxRepresentativeParty()->getPostalAddress()->getStreetName()) // BT-64
-                            ->setLineTwo($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAdditionalStreetName()) // BT-65
-                            ->setLineThree($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAddressLine()?->getLine()) // BT-164
-                            ->setCityName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCityName()) // BT-66
-                            ->setPostcodeCode($invoice->getTaxRepresentativeParty()->getPostalAddress()->getPostalZone()) // BT-67
-                            ->setCountrySubDivisionName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountrySubentity()), // BT-68
-                        new SpecifiedTaxRegistrationVA($invoice->getTaxRepresentativeParty()->getPartyTaxScheme()->getCompanyIdentifier()) // BT-63-00
-                    ))
+                new SellerTaxRepresentativeTradeParty(
+                    $invoice->getTaxRepresentativeParty()?->getPartyName()->getName(), // BT-62
+                    (new PostalTradeAddress( // BG-12
+                        $invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountry()->getIdentificationCode()) // BT-69
+                    )
+                        ->setLineOne($invoice->getTaxRepresentativeParty()->getPostalAddress()->getStreetName()) // BT-64
+                        ->setLineTwo($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAdditionalStreetName()) // BT-65
+                        ->setLineThree($invoice->getTaxRepresentativeParty()->getPostalAddress()->getAddressLine()?->getLine()) // BT-164
+                        ->setCityName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCityName()) // BT-66
+                        ->setPostcodeCode($invoice->getTaxRepresentativeParty()->getPostalAddress()->getPostalZone()) // BT-67
+                        ->setCountrySubDivisionName($invoice->getTaxRepresentativeParty()->getPostalAddress()->getCountrySubentity()), // BT-68
+                    new SpecifiedTaxRegistrationVA($invoice->getTaxRepresentativeParty()->getPartyTaxScheme()->getCompanyIdentifier()) // BT-63-00
+                ))
             ->setContractReferencedDocument( // BT-12
                 null === $invoice->getContractDocumentReference() ? null :
-                    new ContractReferencedDocument(
-                        new ContractReference($invoice->getContractDocumentReference()->getIdentifier())
-                    )
+                new ContractReferencedDocument(
+                    new ContractReference($invoice->getContractDocumentReference()->getIdentifier())
+                )
             )
             ->setBuyerReference($invoice->getBuyerReference()) // BT-10
             ->setBuyerOrderReferencedDocument(// BT-14
                 null === $invoice->getOrderReference() ? null :
-                    new BuyerOrderReferencedDocument(
-                        $invoice->getOrderReference()->getIdentifier()
-                    )
+                new BuyerOrderReferencedDocument(
+                    $invoice->getOrderReference()->getIdentifier()
+                )
             )
         ;
     }
@@ -187,15 +186,15 @@ class UBLToCIICreditNote
         ))
             ->setIdentifier( // BT-46
                 null === $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme ?
-                    $buyerParty->getPartyIdentification()?->getBuyerIdentifier()
-                    : null
+                $buyerParty->getPartyIdentification()?->getBuyerIdentifier()
+                : null
             )
             ->setGlobalIdentifier( // BT-46-0 & BT-46-1
                 $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme ?
-                    new BuyerGlobalIdentifier(
-                        $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->value,
-                        $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme
-                    ) : null
+                new BuyerGlobalIdentifier(
+                    $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->value,
+                    $buyerParty->getPartyIdentification()?->getBuyerIdentifier()->scheme
+                ) : null
             )
             ->setSpecifiedLegalOrganization( // BT-47
                 (new BuyerSpecifiedLegalOrganization())
@@ -204,28 +203,19 @@ class UBLToCIICreditNote
             )
             ->setSpecifiedTaxRegistrationVA( // BT-48
                 null === $buyerParty->getPartyTaxScheme() ? null :
-                    new SpecifiedTaxRegistrationVA(
-                        $buyerParty->getPartyTaxScheme()->getCompanyIdentifier()
-                    )
+                new SpecifiedTaxRegistrationVA(
+                    $buyerParty->getPartyTaxScheme()->getCompanyIdentifier()
+                )
             )
             ->setURIUniversalCommunication( // BT-49
                 null === $buyerParty->getEndpointIdentifier() ? null :
-                    new URIUniversalCommunication(
-                        new ElectronicAddressIdentifier(
-                            $buyerParty->getEndpointIdentifier()->value,
-                            $buyerParty->getEndpointIdentifier()->scheme
-                        )
+                new URIUniversalCommunication(
+                    new ElectronicAddressIdentifier(
+                        $buyerParty->getEndpointIdentifier()->value,
+                        $buyerParty->getEndpointIdentifier()->scheme
                     )
+                )
             )
-            /* TODO: BG-9 quand on implémentera CII EN16931
-            ->setDefinedTradeContact( // BG-9
-                null === $buyerParty->getContact() ? null
-                    : (new DefinedTradeContact())
-                        ->setPersonName($buyerParty->getContact()->getName()) // BT-56
-                        ->setTelephoneUniversalCommunication(new TelephoneUniversalCommunication($buyerParty->getContact()->getTelephone())) // BT-57
-                        ->setEmailURIUniversalCommunication(new EmailURIUniversalCommunication($buyerParty->getContact()->getElectronicMail())) // BT-58
-            )
-            */
         ;
     }
 
@@ -277,22 +267,13 @@ class UBLToCIICreditNote
             )
             ->setURIUniversalCommunication( // BT-34
                 null === $sellerParty->getEndpointIdentifier() ? null :
-                    new URIUniversalCommunication(
-                        new ElectronicAddressIdentifier(
-                            $sellerParty->getEndpointIdentifier()->value,
-                            $sellerParty->getEndpointIdentifier()->scheme
-                        )
+                new URIUniversalCommunication(
+                    new ElectronicAddressIdentifier(
+                        $sellerParty->getEndpointIdentifier()->value,
+                        $sellerParty->getEndpointIdentifier()->scheme
                     )
+                )
             )
-            /* TODO: BG-6 quand on implémentera CII EN16931
-            ->setDefinedTradeContact( // BG-6
-                null === $sellerParty->getContact() ? null
-                    : (new DefinedTradeContact())
-                        ->setPersonName($sellerParty->getContact()->getName()) // BT-41
-                        ->setTelephoneUniversalCommunication(new TelephoneUniversalCommunication($sellerParty->getContact()->getTelephone())) // BT-42
-                        ->setEmailURIUniversalCommunication(new EmailURIUniversalCommunication($sellerParty->getContact()->getElectronicMail())) // BT-43
-            )
-            */
         ;
     }
 
@@ -305,13 +286,13 @@ class UBLToCIICreditNote
             ->setShipToTradeParty(self::getDelivery($invoice)) // BG-13
             ->setActualDeliverySupplyChainEvent( // BT-72-00
                 null !== $invoice->getDelivery()?->getActualDeliveryDate()?->getDateTimeString() ?
-                    new ActualDeliverySupplyChainEvent(new OccurrenceDateTime($invoice->getDelivery()?->getActualDeliveryDate()?->getDateTimeString()))
-                    : null
+                new ActualDeliverySupplyChainEvent(new OccurrenceDateTime($invoice->getDelivery()?->getActualDeliveryDate()?->getDateTimeString()))
+                : null
             )
             ->setDespatchAdviceReferencedDocument( // BT-16-00
                 null !== $invoice->getDespatchDocumentReference() ?
-                    new DespatchAdviceReferencedDocument(new DespatchAdviceReference($invoice->getDespatchDocumentReference()?->getIdentifier()))
-                    : null
+                new DespatchAdviceReferencedDocument(new DespatchAdviceReference($invoice->getDespatchDocumentReference()?->getIdentifier()))
+                : null
             )
         ;
     }
@@ -330,7 +311,7 @@ class UBLToCIICreditNote
         return (new ShipToTradeParty())
             ->setIdentifier( // BT-71
                 null === $delivery->getDeliveryLocation()?->getIdentifier()?->scheme ?
-                    $delivery->getDeliveryLocation()?->getIdentifier() : null
+                $delivery->getDeliveryLocation()?->getIdentifier() : null
             )
             ->setGlobalIdentifier( // BT-71-0 & BT-71-1
                 null !== $delivery->getDeliveryLocation()?->getIdentifier()?->scheme ?
@@ -342,13 +323,13 @@ class UBLToCIICreditNote
             ->setName($delivery->getDeliveryParty()?->getPartyName()->getName()) // BT-70
             ->setPostalTradeAddress( // BG-15
                 null === $delivery->getDeliveryLocation()?->getAddress() ? null :
-                    (new PostalTradeAddress($delivery->getDeliveryLocation()->getAddress()->getCountry()->getIdentificationCode()))
-                        ->setLineOne($delivery->getDeliveryLocation()->getAddress()->getStreetName()) // BT-75
-                        ->setLineTwo($delivery->getDeliveryLocation()->getAddress()->getAdditionalStreetName()) // BT-76
-                        ->setLineThree($delivery->getDeliveryLocation()->getAddress()->getAddressLine()?->getLine()) // BT-163
-                        ->setCityName($delivery->getDeliveryLocation()->getAddress()->getCityName()) // BT-77
-                        ->setPostcodeCode($delivery->getDeliveryLocation()->getAddress()->getPostalZone()) // BT-78
-                        ->setCountrySubDivisionName($delivery->getDeliveryLocation()->getAddress()->getCountrySubentity()) // BT-79
+                (new PostalTradeAddress($delivery->getDeliveryLocation()->getAddress()->getCountry()->getIdentificationCode()))
+                    ->setLineOne($delivery->getDeliveryLocation()->getAddress()->getStreetName()) // BT-75
+                    ->setLineTwo($delivery->getDeliveryLocation()->getAddress()->getAdditionalStreetName()) // BT-76
+                    ->setLineThree($delivery->getDeliveryLocation()->getAddress()->getAddressLine()?->getLine()) // BT-163
+                    ->setCityName($delivery->getDeliveryLocation()->getAddress()->getCityName()) // BT-77
+                    ->setPostcodeCode($delivery->getDeliveryLocation()->getAddress()->getPostalZone()) // BT-78
+                    ->setCountrySubDivisionName($delivery->getDeliveryLocation()->getAddress()->getCountrySubentity()) // BT-79
             )
         ;
     }
@@ -365,15 +346,15 @@ class UBLToCIICreditNote
         ))
             ->setBillingSpecifiedPeriod( // BG-14
                 null === $invoice->getInvoicePeriod() ? null :
-                    (new BillingSpecifiedPeriod())
-                        ->setStartDateTime( // BT-73-00
-                            null === $invoice->getInvoicePeriod()->getStartDate() ? null :
-                                new StartDateTime($invoice->getInvoicePeriod()->getStartDate()->getDateTimeString())
-                        )
-                        ->setEndDateTime( // BT-74-00
-                            null === $invoice->getInvoicePeriod()->getEndDate() ? null :
-                                new EndDateTime($invoice->getInvoicePeriod()->getEndDate()->getDateTimeString())
-                        )
+                (new BillingSpecifiedPeriod())
+                    ->setStartDateTime( // BT-73-00
+                        null === $invoice->getInvoicePeriod()->getStartDate() ? null :
+                        new StartDateTime($invoice->getInvoicePeriod()->getStartDate()->getDateTimeString())
+                    )
+                    ->setEndDateTime( // BT-74-00
+                        null === $invoice->getInvoicePeriod()->getEndDate() ? null :
+                        new EndDateTime($invoice->getInvoicePeriod()->getEndDate()->getDateTimeString())
+                    )
             )
             ->setInvoiceReferencedDocuments(
                 array_map(
@@ -382,7 +363,7 @@ class UBLToCIICreditNote
                     ))
                         ->setFormattedIssueDateTime(
                             null === $invoiceReference->getInvoiceDocumentReference()->getIssueDate() ? null :
-                                new FormattedIssueDateTime($invoiceReference->getInvoiceDocumentReference()->getIssueDate()->getDateTimeString())
+                            new FormattedIssueDateTime($invoiceReference->getInvoiceDocumentReference()->getIssueDate()->getDateTimeString())
                         ),
                     $invoice->getBillingReferences()
                 )
@@ -397,7 +378,7 @@ class UBLToCIICreditNote
                     )
                     ->setDirectDebitMandateIdentifier( // BT-89
                         null === $invoice->getPaymentMeans()[0]?->getPaymentMandate() ? null :
-                            $invoice->getPaymentMeans()[0]->getPaymentMandate()->getIdentifier()
+                        $invoice->getPaymentMeans()[0]->getPaymentMandate()->getIdentifier()
                     )
             )
             ->setPaymentReference(
@@ -405,11 +386,11 @@ class UBLToCIICreditNote
             ) // BT-83, TODO : à implémenter en fonction des cardinalités à clarifier
             ->setCreditorReferenceIdentifier( // BT-90
                 null === $invoice->getPayeeParty()?->getPartyBankAssignedCreditorIdentification()?->getBankAssignedCreditorIdentifier() ? null :
-                    new BankAssignedCreditorIdentifier($invoice->getPayeeParty()->getPartyBankAssignedCreditorIdentification()->getBankAssignedCreditorIdentifier())
+                new BankAssignedCreditorIdentifier($invoice->getPayeeParty()->getPartyBankAssignedCreditorIdentification()->getBankAssignedCreditorIdentifier())
             )
             ->setReceivableSpecifiedTradeAccountingAccount(
                 null === $invoice->getAccountingCost() ? null :
-                    new ReceivableSpecifiedTradeAccountingAccount($invoice->getAccountingCost())
+                new ReceivableSpecifiedTradeAccountingAccount($invoice->getAccountingCost())
             ) // BT-19-00
             ->setSpecifiedTradeAllowances(self::getSpecifiedTradeAllowances($invoice)) // BG-20
             ->setSpecifiedTradeCharges(self::getSpecifiedTradeCharges($invoice)) // BG-21
@@ -444,7 +425,7 @@ class UBLToCIICreditNote
     /**
      * BG-23.
      *
-     * @return ApplicableTradeTax[]
+     * @return HeaderApplicableTradeTax[]
      */
     private static function getApplicableTradeTaxes(UniversalBusinessLanguage $invoice): array
     {
@@ -559,13 +540,13 @@ class UBLToCIICreditNote
             ))
                 ->setPayerPartyDebtorFinancialAccount( // BT-91-00
                     payerPartyDebtorFinancialAccount: null === $paymentMeans->getPaymentMandate()?->getPayerFinancialAccount()?->getIdentifier() ? null :
-                        new PayerPartyDebtorFinancialAccount($paymentMeans->getPaymentMandate()->getPayerFinancialAccount()->getIdentifier()) // BT-91
+                    new PayerPartyDebtorFinancialAccount($paymentMeans->getPaymentMandate()->getPayerFinancialAccount()->getIdentifier()) // BT-91
                 )
                 ->setPayeePartyCreditorFinancialAccount( // BG-17
                     payeePartyCreditorFinancialAccount: null === $paymentMeans->getPayeeFinancialAccount()?->getPaymentAccountIdentifier() ? null :
-                        (new PayeePartyCreditorFinancialAccount())
-                            ->setProprietaryIdentifier($paymentMeans->getPayeeFinancialAccount()?->getPaymentAccountIdentifier())
-                            ->setIbanIdentifier($paymentMeans->getPayeeFinancialAccount()?->getPaymentAccountIdentifier()) // BT-84
+                    (new PayeePartyCreditorFinancialAccount())
+                        ->setProprietaryIdentifier($paymentMeans->getPayeeFinancialAccount()?->getPaymentAccountIdentifier())
+                        ->setIbanIdentifier($paymentMeans->getPayeeFinancialAccount()?->getPaymentAccountIdentifier()) // BT-84
                 ),
             $invoice->getPaymentMeans())
         ;

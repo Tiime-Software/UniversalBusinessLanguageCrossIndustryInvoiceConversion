@@ -9,8 +9,7 @@
     <cbc:DueDate>2023-01-30</cbc:DueDate>
     <cbc:InvoiceTypeCode>393</cbc:InvoiceTypeCode>
     <cbc:Note>#REG#FOURNISSEUR F SARL au capital de 50 000 EUR</cbc:Note>
-    <cbc:Note>#PMD#Tout retard de paiement engendre une pénalité exigible à compter de la date d'échéance, calculée sur
-        la base de trois fois le taux d'intérêt légal.
+    <cbc:Note>#PMD#Tout retard de paiement engendre une pénalité exigible à compter de la date d'échéance, calculée sur la base de trois fois le taux d'intérêt légal.
     </cbc:Note>
     <cbc:Note>#PMT#Indemnité forfaitaire pour frais de recouvrement en cas de retard de paiement : 40 €.</cbc:Note>
     <cbc:Note>#AAB#Les réglements reçus avant la date d'échéance ne donneront pas lieu à escompte.</cbc:Note>

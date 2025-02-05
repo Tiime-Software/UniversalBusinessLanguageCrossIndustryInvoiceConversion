@@ -10,11 +10,9 @@
     <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
     <cbc:Note>#REG#FOURNISSEUR F SARL au capital de 50 000 EUR</cbc:Note>
     <cbc:Note>#ABL#RCS MAVILLE 123 456 782</cbc:Note>
-    <cbc:Note>#AAI#35 ma rue a moi, code postal Ville Pays – contact@masociete.fr - www.masociete.fr – N° TVA : FR32 123
-        456 789
+    <cbc:Note>#AAI#35 ma rue a moi, code postal Ville Pays – contact@masociete.fr - www.masociete.fr – N° TVA : FR32 123 456 789
     </cbc:Note>
-    <cbc:Note>#PMD#Tout retard de paiement engendre une pénalité exigible à compter de la date d'échéance, calculée sur
-        la base de trois fois le taux d'intérêt légal.
+    <cbc:Note>#PMD#Tout retard de paiement engendre une pénalité exigible à compter de la date d'échéance, calculée sur la base de trois fois le taux d'intérêt légal.
     </cbc:Note>
     <cbc:Note>#PMT#Indemnité forfaitaire pour frais de recouvrement en cas de retard de paiement : 40 €.</cbc:Note>
     <cbc:Note>#AAB#Les réglements reçus avant la date d'échéance ne donneront pas lieu à escompte.</cbc:Note>

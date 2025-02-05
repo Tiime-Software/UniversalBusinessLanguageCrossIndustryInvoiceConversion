@@ -1,25 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ubl:Invoice xmlns:ubl="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
-             xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
-             xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+<ubl:CreditNote xmlns:ubl="urn:oasis:names:specification:ubl:schema:xsd:CreditNote-2"
+                xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+                xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
     <cbc:CustomizationID>urn:cen.eu:en16931:2017</cbc:CustomizationID>
     <cbc:ProfileID>A1</cbc:ProfileID>
-    <cbc:ID>F20220029</cbc:ID>
+    <cbc:ID>F20220028</cbc:ID>
     <cbc:IssueDate>2022-01-31</cbc:IssueDate>
-    <cbc:DueDate>2022-03-02</cbc:DueDate>
-    <cbc:InvoiceTypeCode>380</cbc:InvoiceTypeCode>
-    <cbc:Note>#REG#FOURNISSEUR F SARL au capital de 50 000 EUR</cbc:Note>
-    <cbc:Note>#ABL#RCS MAVILLE 123 456 782</cbc:Note>
-    <cbc:Note>#AAI#35 ma rue a moi, code postal Ville Pays – contact@masociete.fr - www.masociete.fr – N° TVA : FR32 123 456 789
+    <cbc:CreditNoteTypeCode>381</cbc:CreditNoteTypeCode>
+    <cbc:Note>##REG##FOURNISSEUR F SARL au capital de 50 000 EUR</cbc:Note>
+    <cbc:Note>##ABL##RCS MAVILLE 123 456 782</cbc:Note>
+    <cbc:Note>##AAI##35 ma rue a moi, code postal Ville Pays – contact@masociete.fr - www.masociete.fr – N° TVA : FR32
+        123 456 789
     </cbc:Note>
-    <cbc:Note>#PMD#Tout retard de paiement engendre une pénalité exigible à compter de la date d'échéance, calculée sur la base de trois fois le taux d'intérêt légal.
+    <cbc:Note>##PMD##Tout retard de paiement engendre une pénalité exigible à compter de la date d'échéance, calculée
+        sur la base de trois fois le taux d'intérêt légal.
     </cbc:Note>
-    <cbc:Note>#PMT#Indemnité forfaitaire pour frais de recouvrement en cas de retard de paiement : 40 €.</cbc:Note>
-    <cbc:Note>#AAB#Les réglements reçus avant la date d'échéance ne donneront pas lieu à escompte.</cbc:Note>
+    <cbc:Note>##PMT##Indemnité forfaitaire pour frais de recouvrement en cas de retard de paiement : 40 €.</cbc:Note>
+    <cbc:Note>##AAB##Les réglements reçus avant la date d'échéance ne donneront pas lieu à escompte.</cbc:Note>
     <cbc:DocumentCurrencyCode>EUR</cbc:DocumentCurrencyCode>
     <cbc:AccountingCost>BUYER ACCOUNT REF</cbc:AccountingCost>
     <cbc:BuyerReference>SERVEXEC</cbc:BuyerReference>
     <cac:InvoicePeriod>
+        <cbc:StartDate>2022-01-01</cbc:StartDate>
+        <cbc:EndDate>2022-12-31</cbc:EndDate>
         <cbc:DescriptionCode>432</cbc:DescriptionCode>
     </cac:InvoicePeriod>
     <cac:OrderReference>
@@ -38,9 +41,6 @@
     <cac:ReceiptDocumentReference>
         <cbc:ID>RECEIV-ADV002</cbc:ID>
     </cac:ReceiptDocumentReference>
-    <cac:OriginatorDocumentReference>
-        <cbc:ID>TENDER-002</cbc:ID>
-    </cac:OriginatorDocumentReference>
     <cac:ContractDocumentReference>
         <cbc:ID>CT2018120802</cbc:ID>
     </cac:ContractDocumentReference>
@@ -57,9 +57,13 @@
         <cbc:ID>REFCLI0215</cbc:ID>
         <cbc:DocumentTypeCode>130</cbc:DocumentTypeCode>
     </cac:AdditionalDocumentReference>
-    <cac:ProjectReference>
+    <cac:AdditionalDocumentReference>
         <cbc:ID>PROJET2547</cbc:ID>
-    </cac:ProjectReference>
+        <cbc:DocumentTypeCode>50</cbc:DocumentTypeCode>
+    </cac:AdditionalDocumentReference>
+    <cac:OriginatorDocumentReference>
+        <cbc:ID>TENDER-002</cbc:ID>
+    </cac:OriginatorDocumentReference>
     <cac:AccountingSupplierParty>
         <cac:Party>
             <cbc:EndpointID schemeID="EM">moi@seller.com</cbc:EndpointID>
@@ -102,7 +106,7 @@
                 <cbc:CityName>NICE</cbc:CityName>
                 <cbc:PostalZone>06000</cbc:PostalZone>
                 <cac:Country>
-                    <cbc:IdentificationCode>DE</cbc:IdentificationCode>
+                    <cbc:IdentificationCode>FR</cbc:IdentificationCode>
                 </cac:Country>
             </cac:PostalAddress>
             <cac:PartyTaxScheme>
@@ -123,10 +127,10 @@
             <cac:Address>
                 <cbc:StreetName>DEL 58 rue de la mer</cbc:StreetName>
                 <cbc:AdditionalStreetName>DEL line 2</cbc:AdditionalStreetName>
-                <cbc:CityName>BERLIN</cbc:CityName>
+                <cbc:CityName>NICE</cbc:CityName>
                 <cbc:PostalZone>06000</cbc:PostalZone>
                 <cac:Country>
-                    <cbc:IdentificationCode>DE</cbc:IdentificationCode>
+                    <cbc:IdentificationCode>FR</cbc:IdentificationCode>
                 </cac:Country>
             </cac:Address>
         </cac:DeliveryLocation>
@@ -146,24 +150,23 @@
     <cac:AllowanceCharge>
         <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
         <cbc:AllowanceChargeReason>FRAIS DEPLACEMENT</cbc:AllowanceChargeReason>
-        <cbc:Amount currencyID="EUR">-10.00</cbc:Amount>
+        <cbc:Amount currencyID="EUR">10.00</cbc:Amount>
         <cac:TaxCategory>
-            <cbc:ID>K</cbc:ID>
-            <cbc:Percent>0.00</cbc:Percent>
+            <cbc:ID>S</cbc:ID>
+            <cbc:Percent>10.00</cbc:Percent>
             <cac:TaxScheme>
                 <cbc:ID>VAT</cbc:ID>
             </cac:TaxScheme>
         </cac:TaxCategory>
     </cac:AllowanceCharge>
     <cac:TaxTotal>
-        <cbc:TaxAmount currencyID="EUR">0.00</cbc:TaxAmount>
+        <cbc:TaxAmount currencyID="EUR">10.00</cbc:TaxAmount>
         <cac:TaxSubtotal>
-            <cbc:TaxableAmount currencyID="EUR">-100.00</cbc:TaxableAmount>
-            <cbc:TaxAmount currencyID="EUR">0.00</cbc:TaxAmount>
+            <cbc:TaxableAmount currencyID="EUR">100.00</cbc:TaxableAmount>
+            <cbc:TaxAmount currencyID="EUR">10.00</cbc:TaxAmount>
             <cac:TaxCategory>
-                <cbc:ID>K</cbc:ID>
-                <cbc:Percent>0.00</cbc:Percent>
-                <cbc:TaxExemptionReasonCode>VATEX-EU-IC</cbc:TaxExemptionReasonCode>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>10.00</cbc:Percent>
                 <cac:TaxScheme>
                     <cbc:ID>VAT</cbc:ID>
                 </cac:TaxScheme>
@@ -171,18 +174,18 @@
         </cac:TaxSubtotal>
     </cac:TaxTotal>
     <cac:LegalMonetaryTotal>
-        <cbc:LineExtensionAmount currencyID="EUR">-95.00</cbc:LineExtensionAmount>
-        <cbc:TaxExclusiveAmount currencyID="EUR">-100.00</cbc:TaxExclusiveAmount>
-        <cbc:TaxInclusiveAmount currencyID="EUR">-100.00</cbc:TaxInclusiveAmount>
-        <cbc:AllowanceTotalAmount currencyID="EUR">-5.00</cbc:AllowanceTotalAmount>
-        <cbc:ChargeTotalAmount currencyID="EUR">-10.00</cbc:ChargeTotalAmount>
-        <cbc:PrepaidAmount currencyID="EUR">-10.00</cbc:PrepaidAmount>
-        <cbc:PayableAmount currencyID="EUR">-90.00</cbc:PayableAmount>
+        <cbc:LineExtensionAmount currencyID="EUR">95.00</cbc:LineExtensionAmount>
+        <cbc:TaxExclusiveAmount currencyID="EUR">100.00</cbc:TaxExclusiveAmount>
+        <cbc:TaxInclusiveAmount currencyID="EUR">110.00</cbc:TaxInclusiveAmount>
+        <cbc:AllowanceTotalAmount currencyID="EUR">5.00</cbc:AllowanceTotalAmount>
+        <cbc:ChargeTotalAmount currencyID="EUR">10.00</cbc:ChargeTotalAmount>
+        <cbc:PrepaidAmount currencyID="EUR">10.00</cbc:PrepaidAmount>
+        <cbc:PayableAmount currencyID="EUR">100.00</cbc:PayableAmount>
     </cac:LegalMonetaryTotal>
-    <cac:InvoiceLine>
+    <cac:CreditNoteLine>
         <cbc:ID>1</cbc:ID>
-        <cbc:InvoicedQuantity unitCode="C62">-1.0000</cbc:InvoicedQuantity>
-        <cbc:LineExtensionAmount currencyID="EUR">-60.00</cbc:LineExtensionAmount>
+        <cbc:CreditedQuantity unitCode="C62">1.0000</cbc:CreditedQuantity>
+        <cbc:LineExtensionAmount currencyID="EUR">60.00</cbc:LineExtensionAmount>
         <cac:InvoicePeriod>
             <cbc:StartDate>2022-01-01</cbc:StartDate>
             <cbc:EndDate>2022-01-31</cbc:EndDate>
@@ -196,8 +199,8 @@
                 <cbc:ID schemeID="0160">598785412598745</cbc:ID>
             </cac:StandardItemIdentification>
             <cac:ClassifiedTaxCategory>
-                <cbc:ID>K</cbc:ID>
-                <cbc:Percent>0.00</cbc:Percent>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>10.00</cbc:Percent>
                 <cac:TaxScheme>
                     <cbc:ID>VAT</cbc:ID>
                 </cac:TaxScheme>
@@ -212,11 +215,11 @@
                 <cbc:BaseAmount currencyID="EUR">60.00</cbc:BaseAmount>
             </cac:AllowanceCharge>
         </cac:Price>
-    </cac:InvoiceLine>
-    <cac:InvoiceLine>
+    </cac:CreditNoteLine>
+    <cac:CreditNoteLine>
         <cbc:ID>2</cbc:ID>
-        <cbc:InvoicedQuantity unitCode="C62">-3.0000</cbc:InvoicedQuantity>
-        <cbc:LineExtensionAmount currencyID="EUR">-30.00</cbc:LineExtensionAmount>
+        <cbc:CreditedQuantity unitCode="C62">3.0000</cbc:CreditedQuantity>
+        <cbc:LineExtensionAmount currencyID="EUR">30.00</cbc:LineExtensionAmount>
         <cac:InvoicePeriod>
             <cbc:StartDate>2022-01-01</cbc:StartDate>
         </cac:InvoicePeriod>
@@ -226,8 +229,8 @@
         <cac:Item>
             <cbc:Name>FOURNITURES DIVERSES</cbc:Name>
             <cac:ClassifiedTaxCategory>
-                <cbc:ID>K</cbc:ID>
-                <cbc:Percent>0.00</cbc:Percent>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>10.00</cbc:Percent>
                 <cac:TaxScheme>
                     <cbc:ID>VAT</cbc:ID>
                 </cac:TaxScheme>
@@ -241,19 +244,19 @@
                 <cbc:BaseAmount currencyID="EUR">10.00</cbc:BaseAmount>
             </cac:AllowanceCharge>
         </cac:Price>
-    </cac:InvoiceLine>
-    <cac:InvoiceLine>
+    </cac:CreditNoteLine>
+    <cac:CreditNoteLine>
         <cbc:ID>3</cbc:ID>
-        <cbc:InvoicedQuantity unitCode="C62">-1.0000</cbc:InvoicedQuantity>
-        <cbc:LineExtensionAmount currencyID="EUR">-5.00</cbc:LineExtensionAmount>
+        <cbc:CreditedQuantity unitCode="C62">1.0000</cbc:CreditedQuantity>
+        <cbc:LineExtensionAmount currencyID="EUR">5.00</cbc:LineExtensionAmount>
         <cac:InvoicePeriod>
             <cbc:EndDate>2022-01-31</cbc:EndDate>
         </cac:InvoicePeriod>
         <cac:Item>
             <cbc:Name>APPEL</cbc:Name>
             <cac:ClassifiedTaxCategory>
-                <cbc:ID>K</cbc:ID>
-                <cbc:Percent>0.00</cbc:Percent>
+                <cbc:ID>S</cbc:ID>
+                <cbc:Percent>10.00</cbc:Percent>
                 <cac:TaxScheme>
                     <cbc:ID>VAT</cbc:ID>
                 </cac:TaxScheme>
@@ -267,5 +270,5 @@
                 <cbc:BaseAmount currencyID="EUR">5.00</cbc:BaseAmount>
             </cac:AllowanceCharge>
         </cac:Price>
-    </cac:InvoiceLine>
-</ubl:Invoice>
+    </cac:CreditNoteLine>
+</ubl:CreditNote>
