@@ -228,7 +228,7 @@ class UBLToCIIEN16931CreditNote
                             $additionalDocumentReference->getAttachment()?->getEmbeddedDocumentBinaryObject()
                         ) // BT-125
                     ,
-                    array_filter($invoice->getAdditionalDocumentReferences(), fn (AdditionalDocumentReference $additionalDocumentReference) => null === $additionalDocumentReference->getIdentifier()->scheme)
+                    array_filter($invoice->getAdditionalDocumentReferences(), fn (AdditionalDocumentReference $additionalDocumentReference) => '916' === $additionalDocumentReference->getDocumentTypeCode())
                 )
             ) // BG-24
             ->setAdditionalReferencedDocumentInvoicedObjectIdentifier(
@@ -298,7 +298,7 @@ class UBLToCIIEN16931CreditNote
                         ->setPersonName($buyerParty->getContact()->getName()) // BT-56
                         ->setTelephoneUniversalCommunication(new TelephoneUniversalCommunication($buyerParty->getContact()->getTelephone())) // BT-57
                         ->setEmailURIUniversalCommunication(new EmailURIUniversalCommunication($buyerParty->getContact()->getElectronicMail())) // BT-58
-                        ->setDepartmentName('') // BT-56-00 TODO not in UBL ?
+                        ->setDepartmentName('') // BT-56-0 TODO not in UBL ? vérifier les nouvelles specs AFNOR pour la gestion de la regle STR-5 sur peopleName vs depârtmentName en CII
             )
         ;
     }
@@ -846,7 +846,7 @@ class UBLToCIIEN16931CreditNote
     {
         $filteredReferences = array_filter(
             $invoice->getAdditionalDocumentReferences(),
-            fn (AdditionalDocumentReference $additionalDocumentReference) => null !== $additionalDocumentReference->getIdentifier()->scheme
+            fn (AdditionalDocumentReference $additionalDocumentReference) => '130' === $additionalDocumentReference->getDocumentTypeCode()
         );
         $additionalDocumentReference = reset($filteredReferences);
 
